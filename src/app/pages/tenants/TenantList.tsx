@@ -89,7 +89,7 @@ export function TenantList() {
                 onClick={() => navigate(`/tenants/${tenant.id}`)}
               >
                 {isUpgrade && (
-                  <td className="px-4 py-3 text-gray-500 text-xs font-mono">{tenant.id}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs font-mono">{tenant.socialHousingApp.tenantCode}</td>
                 )}
                 <td className="px-4 py-3">
                   <span className="text-gray-800">{tenant.name}</span>

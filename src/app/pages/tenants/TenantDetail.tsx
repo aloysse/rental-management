@@ -73,19 +73,25 @@ export function TenantDetail() {
   const [activeTab, setActiveTab] = useState<TabId>("info");
   const [viewingProperty, setViewingProperty] = useState<typeof properties[0] | null>(null);
   const [convertingProperty, setConvertingProperty] = useState<typeof properties[0] | null>(null);
+  const [filters, setFilters] = useState({
+    minRent: tenant?.preferredRent.min ?? 0,
+    maxRent: tenant?.preferredRent.max ?? 50000,
+    district: tenant?.preferredDistrict ?? "",
+    roomType: tenant?.preferredRoomType ?? "",
+  });
 
   // 承租中案件：此承租人的 activeRentals
   const myActiveRentals = activeRentals.filter((ar) => ar.tenantId === tenant?.id);
 
-  // 配對案件：符合此承租人條件的委託出租物件 (尚未被配對)
+  // 配對案件：符合過濾條件的委託出租物件 (尚未被配對)
   const activeRentalPropertyIds = new Set(activeRentals.map((ar) => ar.propertyId));
-  const matchedProperties = tenant
-    ? properties.filter((p) =>
-        p.rent <= tenant.preferredRent.max &&
-        p.district === tenant.preferredDistrict &&
-        !activeRentalPropertyIds.has(p.id)
-      )
-    : [];
+  const matchedProperties = properties.filter((p) =>
+    p.rent >= filters.minRent &&
+    p.rent <= filters.maxRent &&
+    (filters.district === "" || p.district === filters.district) &&
+    (filters.roomType === "" || p.type === filters.roomType) &&
+    !activeRentalPropertyIds.has(p.id)
+  );
 
   const tabs = [
     { id: "info" as TabId, label: "承租人資訊" },
@@ -321,6 +327,49 @@ export function TenantDetail() {
           <div>
             <h2 className="text-sm text-gray-700">符合條件的委託出租物件</h2>
             <p className="text-xs text-gray-400 mt-0.5">依租金與地區自動配對</p>
+          </div>
+          {/* 過濾器 */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">租金下限</label>
+                <input
+                  type="number"
+                  className="w-full border border-gray-200 rounded px-3 py-1.5 text-sm text-gray-700"
+                  value={filters.minRent}
+                  onChange={(e) => setFilters((f) => ({ ...f, minRent: Number(e.target.value) }))}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">租金上限</label>
+                <input
+                  type="number"
+                  className="w-full border border-gray-200 rounded px-3 py-1.5 text-sm text-gray-700"
+                  value={filters.maxRent}
+                  onChange={(e) => setFilters((f) => ({ ...f, maxRent: Number(e.target.value) }))}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">地區</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-200 rounded px-3 py-1.5 text-sm text-gray-700"
+                  value={filters.district}
+                  placeholder="不限"
+                  onChange={(e) => setFilters((f) => ({ ...f, district: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">房型</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-200 rounded px-3 py-1.5 text-sm text-gray-700"
+                  value={filters.roomType}
+                  placeholder="不限"
+                  onChange={(e) => setFilters((f) => ({ ...f, roomType: e.target.value }))}
+                />
+              </div>
+            </div>
           </div>
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             <table className="w-full text-sm">
