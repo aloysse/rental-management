@@ -507,7 +507,6 @@ export function PropertyDetail() {
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">狀態設定</h2>
               <div className="space-y-3">
-                <FormField label="出租狀態" placeholder={property?.status || "待出租"} type="select" />
                 {isUpgrade && (
                   <FormField label="申請狀態" placeholder={property?.applied ? "通過" : "未通過"} type="select" />
                 )}

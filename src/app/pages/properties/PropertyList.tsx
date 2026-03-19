@@ -60,7 +60,7 @@ export function PropertyList() {
         {showFilter && (
           <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-4 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-500">狀態</label>
+              <label className="text-xs text-gray-500">租案類型</label>
               <div className="flex gap-1.5 flex-wrap">
                 {["全部", "出租中", "待出租"].map((s) => (
                   <button
@@ -120,7 +120,7 @@ export function PropertyList() {
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">坪數</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">租金</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">出租人</th>
-              <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">狀態</th>
+              <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">租案類型</th>
               {isUpgrade && (
                 <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
                   <span className="flex items-center gap-1">申請狀態 <UpgradeTag /></span>
@@ -147,7 +147,7 @@ export function PropertyList() {
                 <td className="px-4 py-3 text-gray-600">NT$ {property.rent.toLocaleString()}</td>
                 <td className="px-4 py-3 text-gray-500">{property.landlordName}</td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={property.status} />
+                  <StatusBadge status={property.rentalType} />
                 </td>
                 {isUpgrade && (
                   <td className="px-4 py-3">
