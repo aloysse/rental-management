@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, Save, Trash2, ExternalLink } from "lucide-react";
 import { useVersion } from "../../context/VersionContext";
 import { landlords, properties } from "../../data/mockData";
 import { FormField, UpgradeSection, ImageUploadBox, StatusBadge } from "../../components/WireframeTag";
+
+type LandlordKind = "出租人" | "法人";
 
 export function LandlordDetail() {
   const { id } = useParams();
@@ -13,6 +16,10 @@ export function LandlordDetail() {
   const ownedProperties = landlord
     ? properties.filter((p) => landlord.properties.includes(p.id))
     : [];
+
+  const [landlordKind, setLandlordKind] = useState<LandlordKind>(
+    (landlord?.landlordType as LandlordKind) ?? "出租人"
+  );
 
   return (
     <div className="p-6">
@@ -47,31 +54,72 @@ export function LandlordDetail() {
         </div>
       </div>
 
+      {/* 出租人 / 法人 切換 */}
+      <div className="flex items-center gap-2 mb-5">
+        <span className="text-xs text-gray-500">身份類型：</span>
+        <div className="flex rounded border border-gray-300 overflow-hidden text-xs">
+          {(["出租人", "法人"] as LandlordKind[]).map((kind) => (
+            <button
+              key={kind}
+              onClick={() => setLandlordKind(kind)}
+              className={`px-4 py-1.5 transition-colors ${
+                landlordKind === kind
+                  ? "bg-gray-800 text-white"
+                  : "bg-white text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              {kind}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-5">
         {/* Left */}
         <div className="col-span-2 space-y-5">
           {/* Basic */}
           <div className="bg-white border border-gray-200 rounded-lg p-5">
             <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">基本資料</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label="姓名／名稱" placeholder={landlord?.name || "請輸入姓名"} required />
-              <FormField label="身份類型" placeholder={landlord?.type || "請選擇"} type="select" required />
-              <FormField label="性別" placeholder={landlord?.gender || "請選擇"} type="select" required />
-              <FormField label="出生年月日" placeholder={landlord?.birthday || "請輸入出生年月日"} type="date" required />
-              <FormField label="統一編號／身分證" placeholder="請輸入統編或身分證字號" required />
-              <FormField label="手機" placeholder={landlord?.phone || "請輸入手機"} />
-              <FormField label="電話 (日)" placeholder={landlord?.phone || "請輸入電話"} />
-              <FormField label="電話 (夜)" placeholder={landlord?.phone || "請輸入電話"} />
-              <div className="col-span-2">
-                <FormField label="Email" placeholder={landlord?.email || "請輸入 Email"} type="email" />
+
+            {landlordKind === "出租人" ? (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField label="姓名" placeholder={landlord?.name || "請輸入姓名"} required />
+                <FormField label="身分證字號" placeholder="請輸入身分證字號" required />
+                <FormField label="性別" placeholder="請選擇" type="select" />
+                <FormField label="出生年月日" placeholder="YYYY-MM-DD" type="text" />
+                <FormField label="手機" placeholder={landlord?.phone || "請輸入手機"} />
+                <FormField label="電話 (日)" placeholder="請輸入電話" />
+                <FormField label="電話 (夜)" placeholder="請輸入電話" />
+                <div className="col-span-2">
+                  <FormField label="Email" placeholder={landlord?.email || "請輸入 Email"} type="email" />
+                </div>
+                <div className="col-span-2">
+                  <FormField label="戶籍地址" placeholder="請輸入戶籍地址" />
+                </div>
+                <div className="col-span-2">
+                  <FormField label="聯絡地址" placeholder="請輸入聯絡地址" />
+                </div>
               </div>
-              <div className="col-span-2">
-                <FormField label="戶籍地址" placeholder="請輸入戶籍地址" />
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <FormField label="公司名稱" placeholder={(landlord as any)?.companyName || "請輸入公司名稱"} required />
+                </div>
+                <FormField label="統一編號" placeholder={(landlord as any)?.taxId || "請輸入統一編號"} required />
+                <FormField label="代表人姓名" placeholder={(landlord as any)?.representativeName || "請輸入代表人姓名"} required />
+                <FormField label="代表人身分證字號" placeholder="請輸入身分證字號" />
+                <FormField label="聯絡電話" placeholder={landlord?.phone || "請輸入聯絡電話"} />
+                <div className="col-span-2">
+                  <FormField label="Email" placeholder={landlord?.email || "請輸入 Email"} type="email" />
+                </div>
+                <div className="col-span-2">
+                  <FormField label="公司地址" placeholder="請輸入公司地址" />
+                </div>
+                <div className="col-span-2">
+                  <FormField label="聯絡地址" placeholder="請輸入聯絡地址" />
+                </div>
               </div>
-              <div className="col-span-2">
-                <FormField label="聯絡地址" placeholder="請輸入聯絡地址" />
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Bank Info */}
@@ -127,12 +175,16 @@ export function LandlordDetail() {
             <UpgradeSection label="證件上傳">
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs text-gray-500 mb-2">身分證 / 公司登記證明正面</p>
-                  <ImageUploadBox label="上傳身分證正面" />
+                  <p className="text-xs text-gray-500 mb-2">
+                    {landlordKind === "出租人" ? "身分證正面" : "公司登記證明正面"}
+                  </p>
+                  <ImageUploadBox label="上傳正面" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-2">身分證 / 公司登記證明反面</p>
-                  <ImageUploadBox label="上傳身分證反面" />
+                  <p className="text-xs text-gray-500 mb-2">
+                    {landlordKind === "出租人" ? "身分證反面" : "公司登記證明反面"}
+                  </p>
+                  <ImageUploadBox label="上傳反面" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-2">存摺封面</p>

@@ -22,7 +22,7 @@ export function PropertyList() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-gray-800 text-lg">物件管理</h1>
+          <h1 className="text-gray-800 text-lg">委託出租物件</h1>
           <p className="text-xs text-gray-400 mt-0.5">共 {filtered.length} 筆資料</p>
         </div>
         <button

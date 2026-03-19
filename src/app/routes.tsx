@@ -6,23 +6,23 @@ import { LandlordList } from "./pages/landlords/LandlordList";
 import { LandlordDetail } from "./pages/landlords/LandlordDetail";
 import { PropertyList } from "./pages/properties/PropertyList";
 import { PropertyDetail } from "./pages/properties/PropertyDetail";
-import { ContractList } from "./pages/contracts/ContractList";
-import { ContractDetail } from "./pages/contracts/ContractDetail";
+import { ActiveRentalList } from "./pages/active-rentals/ActiveRentalList";
+import { ActiveRentalDetail } from "./pages/active-rentals/ActiveRentalDetail";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Layout,
     children: [
-      { index: true, element: <Navigate to="/tenants" replace /> },
+      { index: true, element: <Navigate to="/properties" replace /> },
       { path: "tenants", Component: TenantList },
       { path: "tenants/:id", Component: TenantDetail },
       { path: "landlords", Component: LandlordList },
       { path: "landlords/:id", Component: LandlordDetail },
       { path: "properties", Component: PropertyList },
       { path: "properties/:id", Component: PropertyDetail },
-      { path: "contracts", Component: ContractList },
-      { path: "contracts/:id", Component: ContractDetail },
+      { path: "active-rentals", Component: ActiveRentalList },
+      { path: "active-rentals/:id", Component: ActiveRentalDetail },
     ],
   },
 ]);

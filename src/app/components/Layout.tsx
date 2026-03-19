@@ -1,7 +1,7 @@
 import { Link, useLocation, Outlet, useNavigate } from "react-router";
 import { useVersion } from "../context/VersionContext";
 import {
-  Users, Building2, FileText, Home, Star, Zap, ChevronDown
+  Users, Building2, Home, Star, Zap, ChevronDown, Key
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -11,10 +11,10 @@ import {
 } from "./ui/dropdown-menu";
 
 const navItems = [
-  { label: "物件", icon: Home, path: "/properties" },
+  { label: "委託出租物件", icon: Home, path: "/properties" },
   { label: "出租人", icon: Building2, path: "/landlords" },
   { label: "承租人", icon: Users, path: "/tenants" },
-  { label: "契約", icon: FileText, path: "/contracts" },
+  { label: "出租中物件", icon: Key, path: "/active-rentals" },
 ];
 
 export function Layout() {
