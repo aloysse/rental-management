@@ -1094,133 +1094,144 @@ export function PropertyDetail() {
 
       {/* ── Tab: 社宅申請（升級版） ── */}
       {activeTab === "socialApp" && isUpgrade && (
-        <div className="max-w-4xl space-y-5">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">社宅申請資料</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField label="出租人編號" placeholder={property?.socialHousingApp?.landlordCode || "請輸入出租人編號"} />
-              <FormField label="虛擬碼" placeholder={property?.socialHousingApp?.virtualCode || "請輸入虛擬碼"} />
-              <FormField label="申請狀態" placeholder={property?.applied ? "已申請" : "未申請"} type="select" />
-            </div>
-          </div>
+        <div className="grid grid-cols-3 gap-5">
+          <div className="col-span-2 space-y-5">
+            <div className="bg-white border border-gray-200 rounded-lg p-5">
+              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">上傳附件</h2>
+              <div className="space-y-4">
+                {SOCIAL_DOCUMENT_GROUPS
+                  .filter((group) => group.id === "buildingProof" || group.id === "otherDocs")
+                  .map((group) => {
+                    const uploadItems =
+                      group.id === "buildingProof"
+                        ? group.items.filter((item) => item.id !== "firstBuildingTranscript")
+                        : group.items;
+                    const groupUploaded = uploadItems.some((item) => isSocialDocumentUploaded(item.keywords));
 
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">上傳附件</h2>
-            <div className="gap-4">
-              {SOCIAL_DOCUMENT_GROUPS.map((group) => {
-                const groupUploaded = group.items.some((item) => isSocialDocumentUploaded(item.keywords));
-                return (
-                  <div key={group.id} className="border border-gray-200 rounded-xl bg-gray-50/60 p-4 space-y-3 mb-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <div>
-                        <p className="text-sm text-gray-700">{group.label}</p>
-                        {"subtitle" in group && group.subtitle && <p className="text-xs text-gray-500 mt-0.5">{group.subtitle}</p>}
+                    return (
+                      <div key={group.id} className="border border-gray-200 rounded-xl bg-gray-50/60 p-4 space-y-3 mb-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-sm text-gray-700">{group.label}</p>
+                            {"subtitle" in group && group.subtitle && <p className="text-xs text-gray-500 mt-0.5">{group.subtitle}</p>}
+                          </div>
+                          {groupUploaded && (
+                            <span className="inline-flex px-2 py-0.5 text-xs rounded border bg-emerald-50 text-emerald-700 border-emerald-200">
+                              已檢附
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          {uploadItems.map((item) => {
+                            const uploaded = isSocialDocumentUploaded(item.keywords);
+                            return (
+                              <div key={item.id} className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 space-y-2">
+                                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                                  <div>
+                                    <p className="text-sm text-gray-700 leading-6">{item.label}</p>
+                                    {"note" in item && item.note && <p className="text-xs text-gray-500 mt-0.5">{item.note}</p>}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`inline-flex px-2 py-0.5 text-xs rounded border ${uploaded ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200"}`}>
+                                      {uploaded ? "已上傳" : "未上傳"}
+                                    </span>
+                                    <FileUploadButton label="上傳檔案" />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                      {groupUploaded && (
-                        <span className="inline-flex px-2 py-0.5 text-xs rounded border bg-emerald-50 text-emerald-700 border-emerald-200">
-                          已檢附
-                        </span>
-                      )}
-                    </div>
+                    );
+                  })}
+              </div>
+            </div>
 
-                    <div className="space-y-2">
-                      {group.items.map((item) => {
-                        const uploaded = isSocialDocumentUploaded(item.keywords);
-                        return (
-                          <div key={item.id} className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 space-y-2">
-                            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="bg-white border border-gray-200 rounded-lg p-5">
+              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">檢附文件</h2>
+              <div className="space-y-4">
+                {SOCIAL_DOCUMENT_GROUPS.map((group, groupIndex) => {
+                  const groupUploaded = group.items.some((item) => isSocialDocumentUploaded(item.keywords));
+                  return (
+                    <div key={group.id} className="border border-gray-100 rounded-lg p-3">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div>
+                          <h3 className="text-sm text-gray-700">{`${groupIndex + 1}. ${group.label}`}</h3>
+                          {"subtitle" in group && group.subtitle && <p className="text-xs text-gray-500 mt-0.5">{group.subtitle}</p>}
+                        </div>
+                        {groupUploaded && (
+                          <span className="inline-flex px-2 py-0.5 text-xs rounded border bg-emerald-50 text-emerald-700 border-emerald-200">
+                            已檢附
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        {group.items.map((item) => {
+                          const uploaded = isSocialDocumentUploaded(item.keywords);
+                          return (
+                            <div key={item.id} className="flex items-start gap-3 rounded border border-gray-100 px-3 py-2">
+                              <span className={`inline-flex items-center justify-center w-5 h-5 mt-0.5 rounded border text-xs ${uploaded ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-white text-transparent border-gray-300"}`}>
+                                ✓
+                              </span>
                               <div>
                                 <p className="text-sm text-gray-700 leading-6">{item.label}</p>
                                 {"note" in item && item.note && <p className="text-xs text-gray-500 mt-0.5">{item.note}</p>}
                               </div>
-                              <div className="flex items-center gap-2">
-                                <span className={`inline-flex px-2 py-0.5 text-xs rounded border ${uploaded ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200"}`}>
-                                  {uploaded ? "已上傳" : "未上傳"}
-                                </span>
-                                <FileUploadButton label="上傳檔案" />
-                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">檢附文件</h2>
-            <div className="space-y-4">
-              {SOCIAL_DOCUMENT_GROUPS.map((group, groupIndex) => {
-                const groupUploaded = group.items.some((item) => isSocialDocumentUploaded(item.keywords));
-                return (
-                  <div key={group.id} className="border border-gray-100 rounded-lg p-3">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <div>
-                        <h3 className="text-sm text-gray-700">{`${groupIndex + 1}. ${group.label}`}</h3>
-                        {"subtitle" in group && group.subtitle && <p className="text-xs text-gray-500 mt-0.5">{group.subtitle}</p>}
+                          );
+                        })}
                       </div>
-                      {groupUploaded && (
-                        <span className="inline-flex px-2 py-0.5 text-xs rounded border bg-emerald-50 text-emerald-700 border-emerald-200">
-                          已檢附
-                        </span>
-                      )}
                     </div>
-
-                    <div className="space-y-2">
-                      {group.items.map((item) => {
-                        const uploaded = isSocialDocumentUploaded(item.keywords);
-                        return (
-                          <div key={item.id} className="flex items-start gap-3 rounded border border-gray-100 px-3 py-2">
-                            <span className={`inline-flex items-center justify-center w-5 h-5 mt-0.5 rounded border text-xs ${uploaded ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-white text-transparent border-gray-300"}`}>
-                              ✓
-                            </span>
-                            <div>
-                              <p className="text-sm text-gray-700 leading-6">{item.label}</p>
-                              {"note" in item && item.note && <p className="text-xs text-gray-500 mt-0.5">{item.note}</p>}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">申請條件</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                {SOCIAL_APPLICATION_CONDITIONS.slice(0, 2).map((item, index) => (
-                  <EditableCheckOption
-                    key={item.id}
-                    label={`${index + 1}. ${item.label}`}
-                    checked={!!socialConditionChecks[item.id]}
-                    onChange={() => toggleSocialCondition(item.id)}
-                  />
-                ))}
-              </div>
-              <div className="border border-gray-100 rounded-lg p-3 space-y-2">
-                <p className="text-sm text-gray-700">合法建物條件（四擇一）</p>
-                {SOCIAL_APPLICATION_CONDITIONS.slice(2).map((item, index) => (
-                  <EditableCheckOption
-                    key={item.id}
-                    label={`${index + 3}. ${item.label}`}
-                    checked={!!socialConditionChecks[item.id]}
-                    onChange={() => toggleSocialCondition(item.id)}
-                  />
-                ))}
+                  );
+                })}
               </div>
             </div>
-          </div>
 
-          <button className="flex items-center gap-2 px-4 py-2.5 border border-amber-400 bg-amber-50 text-amber-700 text-sm rounded hover:bg-amber-100">
-            <Download size={14} />下載申請書
+            <div className="bg-white border border-gray-200 rounded-lg p-5">
+              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">申請條件</h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  {SOCIAL_APPLICATION_CONDITIONS.slice(0, 2).map((item, index) => (
+                    <EditableCheckOption
+                      key={item.id}
+                      label={`${index + 1}. ${item.label}`}
+                      checked={!!socialConditionChecks[item.id]}
+                      onChange={() => toggleSocialCondition(item.id)}
+                    />
+                  ))}
+                </div>
+                <div className="border border-gray-100 rounded-lg p-3 space-y-2">
+                  <p className="text-sm text-gray-700">合法建物條件（四擇一）</p>
+                  {SOCIAL_APPLICATION_CONDITIONS.slice(2).map((item, index) => (
+                    <EditableCheckOption
+                      key={item.id}
+                      label={`${index + 3}. ${item.label}`}
+                      checked={!!socialConditionChecks[item.id]}
+                      onChange={() => toggleSocialCondition(item.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+         
+          </div>
+          <div className="space-y-5">
+            <div className="bg-white border border-gray-200 rounded-lg p-5">
+              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">社宅申請資料</h2>
+              <div className="space-y-4">
+                <FormField label="申請狀態" placeholder={property?.applied ? "已申請" : "未申請"} type="select" />
+                <FormField label="出租人編號" placeholder={property?.socialHousingApp?.landlordCode || "請輸入出租人編號"} />
+                <FormField label="虛擬碼" placeholder={property?.socialHousingApp?.virtualCode || "請輸入虛擬碼"} />
+              </div>
+            </div>
+            <button className="flex items-center gap-2 px-4 py-2.5 border border-amber-400 bg-amber-50 text-amber-700 text-sm rounded hover:bg-amber-100">
+              <Download size={14} />下載申請書
           </button>
+          </div>
         </div>
       )}
 
@@ -1348,13 +1359,12 @@ export function PropertyDetail() {
         </div>
       )}
 
-      {!isNew && (
-        <StepNavBar
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={(id) => setActiveTab(id as TabId)}
-        />
-      )}
+      <StepNavBar
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as TabId)}
+        nextLabel={isNew && activeTab === "propertyInfo" ? "建立物件後下一步" : undefined}
+      />
     </div>
   );
 }
