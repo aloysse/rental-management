@@ -4,9 +4,10 @@ interface StepNavBarProps {
   tabs: Array<{ id: string; label: string }>;
   activeTab: string;
   onTabChange: (id: string) => void;
+  nextLabel?: string;
 }
 
-export function StepNavBar({ tabs, activeTab, onTabChange }: StepNavBarProps) {
+export function StepNavBar({ tabs, activeTab, onTabChange, nextLabel }: StepNavBarProps) {
   const currentIndex = tabs.findIndex((t) => t.id === activeTab);
   const prevTab = tabs[currentIndex - 1] ?? null;
   const nextTab = tabs[currentIndex + 1] ?? null;
@@ -35,7 +36,7 @@ export function StepNavBar({ tabs, activeTab, onTabChange }: StepNavBarProps) {
             onClick={() => onTabChange(nextTab.id)}
             className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700 transition-colors"
           >
-            {nextTab.label}
+            {nextLabel ?? nextTab.label}
             <ArrowRight size={14} />
           </button>
         )}
