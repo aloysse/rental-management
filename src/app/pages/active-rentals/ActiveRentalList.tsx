@@ -4,12 +4,14 @@ import { Search, ChevronRight, Filter, Plus } from "lucide-react";
 import { useVersion } from "../../context/VersionContext";
 import { activeRentals, properties, landlords, tenants } from "../../data/mockData";
 import { StatusBadge, UpgradeTag } from "../../components/WireframeTag";
+import { getLeaseStatus, getDaysUntilExpiry } from "./leaseUtils";
 
 export function ActiveRentalList() {
   const { isUpgrade } = useVersion();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("全部");
+  const [leaseFilter, setLeaseFilter] = useState("全部");
   const [showFilter, setShowFilter] = useState(false);
 
   // Join data from related tables
@@ -17,7 +19,9 @@ export function ActiveRentalList() {
     const property = properties.find((p) => p.id === ar.propertyId);
     const landlord = landlords.find((l) => l.id === ar.landlordId);
     const tenant = tenants.find((t) => t.id === ar.tenantId);
-    return { ...ar, property, landlord, tenant };
+    const leaseStatus = getLeaseStatus(ar);
+    const daysLeft = getDaysUntilExpiry(ar.endDate);
+    return { ...ar, property, landlord, tenant, leaseStatus, daysLeft };
   });
 
   const filtered = rentalRows.filter((row) => {
@@ -27,8 +31,26 @@ export function ActiveRentalList() {
       row.landlord?.name?.includes(search) ||
       row.tenant?.name?.includes(search);
     const matchType = typeFilter === "全部" || row.rentalType === typeFilter;
-    return matchSearch && matchType;
+    const matchLease = leaseFilter === "全部" || row.leaseStatus === leaseFilter;
+    return matchSearch && matchType && matchLease;
   });
+
+  function ExpiryBadge({ row }: { row: typeof rentalRows[0] }) {
+    if (row.leaseStatus === "已結束") {
+      return <StatusBadge status="已結束" />;
+    }
+    if (row.leaseStatus === "已到期") {
+      return <StatusBadge status="已到期" />;
+    }
+    if (row.leaseStatus === "即將到期") {
+      return (
+        <span className="inline-flex px-2 py-0.5 text-xs rounded border bg-yellow-100 text-yellow-700 border-yellow-300">
+          剩 {row.daysLeft} 天
+        </span>
+      );
+    }
+    return <span className="text-xs text-gray-500">{row.daysLeft} 天</span>;
+  }
 
   return (
     <div className="p-6">
@@ -65,11 +87,11 @@ export function ActiveRentalList() {
             <Filter size={14} />篩選
           </button>
           <button className="px-4 py-2 border border-gray-300 text-sm text-gray-600 rounded hover:bg-gray-50">搜尋</button>
-          <button className="px-3 py-2 text-xs text-gray-400 hover:text-gray-600" onClick={() => { setSearch(""); setTypeFilter("全部"); }}>清除</button>
+          <button className="px-3 py-2 text-xs text-gray-400 hover:text-gray-600" onClick={() => { setSearch(""); setTypeFilter("全部"); setLeaseFilter("全部"); }}>清除</button>
         </div>
 
         {showFilter && (
-          <div className="mt-3 pt-3 border-t border-gray-100 flex gap-6">
+          <div className="mt-3 pt-3 border-t border-gray-100 flex gap-8">
             <div className="flex flex-col gap-1">
               <label className="text-xs text-gray-500">租案類型</label>
               <div className="flex gap-1.5">
@@ -78,6 +100,20 @@ export function ActiveRentalList() {
                     key={t}
                     onClick={() => setTypeFilter(t)}
                     className={`px-3 py-1 text-xs rounded border transition-colors ${typeFilter === t ? "border-gray-800 bg-gray-800 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-gray-500">租約狀態</label>
+              <div className="flex gap-1.5">
+                {["全部", "進行中", "即將到期", "已到期", "已結束"].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setLeaseFilter(t)}
+                    className={`px-3 py-1 text-xs rounded border transition-colors ${leaseFilter === t ? "border-gray-800 bg-gray-800 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
                   >
                     {t}
                   </button>
@@ -103,6 +139,7 @@ export function ActiveRentalList() {
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">出租人</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">承租人</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">租賃期間</th>
+              <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">剩餘天數</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">租案類型</th>
               <th className="px-4 py-3 text-right text-xs text-gray-500 font-medium"></th>
             </tr>
@@ -125,6 +162,9 @@ export function ActiveRentalList() {
                 <td className="px-4 py-3 text-gray-500">{row.tenant?.name}</td>
                 <td className="px-4 py-3 text-gray-500 text-xs">
                   {row.startDate} ~ {row.endDate}
+                </td>
+                <td className="px-4 py-3">
+                  <ExpiryBadge row={row} />
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={row.rentalType} />

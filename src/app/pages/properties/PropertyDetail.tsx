@@ -5,12 +5,65 @@ import {
 } from "lucide-react";
 import { useVersion } from "../../context/VersionContext";
 import { properties, landlords, tenants, activeRentals } from "../../data/mockData";
+import { getLeaseStatus } from "../active-rentals/leaseUtils";
 import {
   FormField, UpgradeSection, StatusBadge,
   RadioGroup, FileUploadButton, FileAttachmentList,
 } from "../../components/WireframeTag";
+import { StepNavBar } from "../../components/StepNavBar";
+import { StepTabBar } from "../../components/StepTabBar";
 
 type TabId = "propertyInfo" | "landlordInfo" | "condition" | "socialApp" | "contract" | "attachments" | "matching";
+
+/* ── 歷史租賃紀錄 Section ── */
+function HistoryRentalSection({ historyRentals, onNavigate }: {
+  historyRentals: Array<{ id: string; tenantName: string; startDate: string; endDate: string; terminationReason?: string }>;
+  onNavigate: (path: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between px-5 py-3.5 text-sm text-gray-700 hover:bg-gray-50"
+        onClick={() => setExpanded((v) => !v)}
+      >
+        <span>歷史租賃紀錄（{historyRentals.length} 筆）</span>
+        <span className="text-xs text-gray-400">{expanded ? "收合" : "展開"}</span>
+      </button>
+      {expanded && (
+        <table className="w-full text-sm border-t border-gray-100">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2.5 text-left text-xs text-gray-500 font-medium">承租人</th>
+              <th className="px-4 py-2.5 text-left text-xs text-gray-500 font-medium">租賃期間</th>
+              <th className="px-4 py-2.5 text-left text-xs text-gray-500 font-medium">終止原因</th>
+              <th className="px-4 py-2.5 text-left text-xs text-gray-500 font-medium">狀態</th>
+              <th className="px-4 py-2.5 text-right text-xs text-gray-500 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {historyRentals.map((ar) => (
+              <tr key={ar.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 text-gray-800">{ar.tenantName}</td>
+                <td className="px-4 py-3 text-gray-500 text-xs">{ar.startDate} ~ {ar.endDate}</td>
+                <td className="px-4 py-3 text-gray-500 text-xs">{ar.terminationReason ?? "—"}</td>
+                <td className="px-4 py-3"><StatusBadge status="已結束" /></td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    onClick={() => onNavigate(`/active-rentals/${ar.id}`)}
+                    className="text-xs text-gray-500 px-2 py-1 border border-gray-200 rounded hover:bg-gray-50"
+                  >
+                    查看案件
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
 
 /* ── 委託契約類型 ── */
 const DELEGATION_TYPES = [
@@ -21,6 +74,35 @@ const UPGRADE_DELEGATION_TYPES = [
   { id: "social-lease", label: "社宅包租", desc: "社會住宅包租模式" },
   { id: "social-management", label: "社宅委託管理", desc: "社會住宅委託管理" },
 ];
+
+const RENT_INCLUDE_OPTIONS = ["管理費", "清潔費", "第四台", "網路", "水費", "電費", "瓦斯費"];
+const LIVING_FEATURE_OPTIONS = ["近便利商店", "近傳統市場", "近百貨公司", "近公園綠地", "近學校", "近醫療機構", "近夜市"];
+const TRANSPORT_OPTIONS = ["公車站", "捷運站", "火車站"];
+const TENANT_REQUIREMENT_OPTIONS = ["學生", "上班族", "家庭"];
+
+function MultiSelectPreview({ label, options, selected, required }: {
+  label: string;
+  options: string[];
+  selected?: string[];
+  required?: boolean;
+}) {
+  return (
+    <div className="col-span-2">
+      <label className="text-xs text-gray-500 block mb-2">
+        {label}
+        {required && <span className="text-red-400 ml-0.5">*</span>}
+      </label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((item) => (
+          <label key={item} className="flex items-center gap-1.5 text-xs text-gray-600 border border-gray-200 rounded px-2 py-1 bg-white">
+            <input type="checkbox" className="w-3 h-3" defaultChecked={selected?.includes(item)} readOnly />
+            {item}
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /* ── 委託契約類型選擇 Modal ── */
 function DelegationContractModal({ onClose, existingTypeIds, onSelect }: {
@@ -334,20 +416,30 @@ export function PropertyDetail() {
   const [viewingTenant, setViewingTenant] = useState<typeof tenants[0] | null>(null);
   const [convertingTenant, setConvertingTenant] = useState<typeof tenants[0] | null>(null);
 
-  // Matching: tenants whose preferredRent.max >= property.rent AND district matches, AND not already in activeRentals
-  const activeRentalTenantIds = new Set(activeRentals.map((ar) => ar.tenantId));
+  // Matching: exclude tenants in active (non-ended) rentals only
+  const activeTenantIds = new Set(
+    activeRentals.filter((ar) => !ar.terminatedAt).map((ar) => ar.tenantId)
+  );
   const matchedTenants = property
     ? tenants.filter((t) =>
         t.preferredRent.max >= property.rent &&
         t.preferredDistrict === property.district &&
-        !activeRentalTenantIds.has(t.id)
+        !activeTenantIds.has(t.id)
       )
     : [];
+
+  // History rentals for this property
+  const historyRentals = activeRentals
+    .filter((ar) => ar.propertyId === property?.id && ar.terminatedAt)
+    .map((ar) => {
+      const t = tenants.find((t) => t.id === ar.tenantId);
+      return { ...ar, tenantName: t?.name ?? "—" };
+    });
 
   const tabs = [
     { id: "propertyInfo" as TabId, label: "物件資訊" },
     { id: "landlordInfo" as TabId, label: "出租人資訊" },
-    { id: "condition" as TabId, label: "屋況" },
+    { id: "condition" as TabId, label: "屋況設備" },
     ...(isUpgrade ? [{ id: "socialApp" as TabId, label: "社宅申請" }] : []),
     { id: "contract" as TabId, label: "委託契約" },
     { id: "attachments" as TabId, label: "附加檔案" },
@@ -355,6 +447,9 @@ export function PropertyDetail() {
   ];
 
   const existingContractTypeIds = (property?.delegationContracts ?? []).map((c) => c.typeId);
+  const propertyInfo = property?.propertyInfo;
+  const rentalAddress = propertyInfo?.rentalAddress;
+  const layout = propertyInfo?.layout;
 
   return (
     <div className="p-6">
@@ -427,21 +522,11 @@ export function PropertyDetail() {
       </div>
 
       {/* Tab Bar */}
-      <div className="flex gap-0 border-b border-gray-200 mb-5">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-5 py-2.5 text-sm border-b-2 transition-colors ${
-              activeTab === tab.id
-                ? "border-gray-800 text-gray-800 font-medium"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <StepTabBar
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as TabId)}
+      />
 
       {/* ── Tab: 物件資訊 ── */}
       {activeTab === "propertyInfo" && (
@@ -472,35 +557,94 @@ export function PropertyDetail() {
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">案件基本資訊</h2>
               <div className="grid grid-cols-2 gap-4">
-                {isUpgrade && (
-                  <div className="col-span-2">
-                    <FormField label="物件編號" placeholder={property?.caseNo || "請輸入物件編號"} />
-                  </div>
-                )}
                 <div className="col-span-2">
                   <FormField label="案名" placeholder={property?.name || "請輸入案名"} required />
                 </div>
                 <div className="col-span-2">
-                  <FormField label="地址" placeholder={property?.address || "請輸入物件地址"} required />
+                  <div className="p-4 border border-gray-100 rounded-lg bg-gray-50/50">
+                    <p className="text-xs text-gray-500 mb-3">
+                      出租地址
+                      <span className="text-red-400 ml-0.5">*</span>
+                    </p>
+                    <div className="grid grid-cols-4 gap-3">
+                      <FormField label="縣市" placeholder={rentalAddress?.city || "請選擇縣市"} type="select" required />
+                      <FormField label="鄉鎮區" placeholder={rentalAddress?.district || "請選擇鄉鎮區"} type="select" required />
+                      <FormField label="街道" placeholder={rentalAddress?.street || "請輸入街道"} />
+                      <FormField label="巷" placeholder={rentalAddress?.lane || "請輸入巷"} />
+                      <FormField label="弄" placeholder={rentalAddress?.alley || "請輸入弄"} />
+                      <FormField label="號" placeholder={rentalAddress?.number || "請輸入號"} />
+                      <FormField label="之幾" placeholder={rentalAddress?.subNumber || "請輸入之幾"} />
+                      <FormField label="隱藏門牌" placeholder={rentalAddress?.hideDoorplate ? "是" : "否"} type="select" />
+                    </div>
+                    <div className="mt-3">
+                      <FormField label="完整地址" placeholder={property?.address || "請輸入完整地址"} />
+                    </div>
+                  </div>
                 </div>
-                <FormField label="房型" placeholder={property?.type || "請選擇"} type="select" />
-                <FormField label="樓層" placeholder={property?.floor ? `${property.floor}樓` : "請輸入"} />
+                <FormField label="社區名稱" placeholder={propertyInfo?.communityName || "請輸入社區名稱"} />
+                <FormField label="朝向" placeholder={propertyInfo?.orientation || "請選擇"} type="select" />
+                <FormField label="出租樓層類型" placeholder={propertyInfo?.rentalFloorType || "請選擇"} type="select" required />
+                <FormField label="出租樓層" placeholder={propertyInfo?.rentalFloor || (property?.floor ? `${property.floor}樓` : "請輸入樓層")} required />
+                <FormField label="樓層之幾" placeholder={propertyInfo?.rentalSubFloor || "請輸入（選填）"} />
+                <FormField label="出租總樓層" placeholder={propertyInfo?.totalFloors ? `共 ${propertyInfo.totalFloors} 層` : "請輸入總樓層"} required />
+                <div className="col-span-2 p-4 border border-gray-100 rounded-lg bg-gray-50/50">
+                  <p className="text-xs text-gray-500 mb-3">
+                    格局（現況）
+                    <span className="text-red-400 ml-0.5">*</span>
+                  </p>
+                  <div className="grid grid-cols-5 gap-3">
+                    <FormField label="房" placeholder={layout?.rooms?.toString() || "0"} required />
+                    <FormField label="廳" placeholder={layout?.livingRooms?.toString() || "0"} />
+                    <FormField label="衛" placeholder={layout?.bathrooms?.toString() || "0"} />
+                    <FormField label="陽台" placeholder={layout?.balconies?.toString() || "0"} />
+                    <div className="flex items-end pb-2">
+                      <label className="inline-flex items-center gap-1.5 text-xs text-gray-600">
+                        <input type="checkbox" className="w-3 h-3" defaultChecked={!!layout?.isStudio} readOnly />
+                        開放式格局
+                      </label>
+                    </div>
+                  </div>
+                </div>
                 <FormField label="坪數（建坪）" placeholder={property?.size ? `${property.size}` : ""} />
-                <FormField label="坪數（實坪）" placeholder="請輸入實際坪數" />
-                <FormField label="月租金（元）" placeholder={property?.rent ? `${property.rent.toLocaleString()}` : ""} required />
-                <FormField label="押金（月）" placeholder="請選擇" type="select" />
+                <FormField label="可使用坪數（坪）" placeholder={propertyInfo?.usableArea ? `${propertyInfo.usableArea}` : "請輸入可使用坪數"} required />
+                <FormField label="建築完工日期" placeholder={propertyInfo?.completionDate || "YYYY-MM-DD"} type="text" />
+                <FormField label="月租金（元/月）" placeholder={property?.rent ? `${property.rent.toLocaleString()}` : ""} required />
+                <FormField label="押金" placeholder={propertyInfo?.deposit || "請選擇"} type="select" required />
+                <FormField label="管理費（元/月）" placeholder={propertyInfo?.managementFee ? `${propertyInfo.managementFee}` : "無"} />
+                <FormField label="最短租期" placeholder={propertyInfo?.minLeaseTerm || "請選擇"} type="select" required />
+                <FormField label="可遷入日" placeholder={propertyInfo?.availableMoveInDate || "請選擇日期"} type="text" />
+                <FormField label="裝潢時間" placeholder={propertyInfo?.decorationTime || "請選擇"} type="select" />
+                <FormField label="裝潢程度" placeholder={propertyInfo?.decorationLevel || "請選擇"} type="select" />
+                <FormField label="產權登記" placeholder={propertyInfo?.ownershipRegistration || "請選擇"} type="select" />
+                <FormField label="開伙" placeholder={propertyInfo?.cookingAllowed || "請選擇"} type="select" />
+                <FormField label="養寵物" placeholder={propertyInfo?.petAllowed || "請選擇"} type="select" />
+                <MultiSelectPreview
+                  label="租金包含"
+                  options={RENT_INCLUDE_OPTIONS}
+                  selected={propertyInfo?.rentIncludes}
+                />
+                <MultiSelectPreview
+                  label="生活機能"
+                  options={LIVING_FEATURE_OPTIONS}
+                  selected={propertyInfo?.livingFeatures}
+                />
+                <MultiSelectPreview
+                  label="附近交通"
+                  options={TRANSPORT_OPTIONS}
+                  selected={propertyInfo?.nearbyTransport}
+                />
+                <MultiSelectPreview
+                  label="身分要求"
+                  options={TENANT_REQUIREMENT_OPTIONS}
+                  selected={propertyInfo?.tenantRequirements}
+                />
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-5">
-              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">負責營業員</h2>
-              <FormField label="營業員" placeholder={property?.agentName || "請選擇負責營業員"} type="select" />
-            </div>
-
-            <button className="flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-              <ExternalLink size={15} />
-              591 一鍵拋轉
-            </button>
+            {/* 歷史租賃紀錄（待出租且有歷史租案時顯示） */}
+            {historyRentals.length > 0 && (
+              <HistoryRentalSection historyRentals={historyRentals} onNavigate={navigate} />
+            )}
           </div>
 
           <div className="space-y-5">
@@ -508,7 +652,7 @@ export function PropertyDetail() {
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">狀態設定</h2>
               <div className="space-y-3">
                 {isUpgrade && (
-                  <FormField label="申請狀態" placeholder={property?.applied ? "通過" : "未通過"} type="select" />
+                  <FormField label="社宅申請狀態" placeholder={property?.applied ? "通過" : "未通過"} type="select" />
                 )}
               </div>
             </div>
@@ -516,6 +660,14 @@ export function PropertyDetail() {
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">備註</h2>
               <FormField label="" placeholder="請輸入備註說明..." type="textarea" />
             </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-5">
+              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">負責營業員</h2>
+              <FormField label="營業員" placeholder={property?.agentName || "請選擇負責營業員"} type="select" />
+            </div>
+            <button className="flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm text-white bg-gray-800 hover:bg-gray-600 transition-colors">
+              <ExternalLink size={15} />
+              591 一鍵拋轉
+            </button>
           </div>
         </div>
       )}
@@ -756,6 +908,16 @@ export function PropertyDetail() {
       {/* ── Tab: 承租人配對 ── */}
       {activeTab === "matching" && (
         <div className="space-y-4">
+          {property?.status === "出租中" && (
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-700">
+              此物件目前出租中，如需換租請先辦理停止租賃或不續約。
+            </div>
+          )}
+          {/* {(property?.status === "待出租" || property?.status === "租約到期") && (
+            <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-600">
+              此物件目前待出租，可重新進行承租人配對。
+            </div>
+          )} */}
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm text-gray-700">符合條件的承租人</h2>
@@ -805,6 +967,14 @@ export function PropertyDetail() {
             )}
           </div>
         </div>
+      )}
+
+      {!isNew && (
+        <StepNavBar
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={(id) => setActiveTab(id as TabId)}
+        />
       )}
     </div>
   );

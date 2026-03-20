@@ -68,6 +68,7 @@ export function TenantList() {
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">姓名</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">電話</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">Email</th>
+              <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">承租狀態</th>
               {isUpgrade && (
                 <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
                   <span className="flex items-center gap-1">身份類別 <UpgradeTag /></span>
@@ -75,7 +76,7 @@ export function TenantList() {
               )}
               {isUpgrade && (
                 <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
-                  <span className="flex items-center gap-1">申請狀態 <UpgradeTag /></span>
+                  <span className="flex items-center gap-1">社宅申請 <UpgradeTag /></span>
                 </th>
               )}
               <th className="px-4 py-3 text-right text-xs text-gray-500 font-medium"></th>
@@ -96,6 +97,9 @@ export function TenantList() {
                 </td>
                 <td className="px-4 py-3 text-gray-500">{tenant.phone}</td>
                 <td className="px-4 py-3 text-gray-500">{tenant.email}</td>
+                <td className="px-4 py-3">
+                  <StatusBadge status={tenant.rentalStatus} />
+                </td>
                 {isUpgrade && (
                   <td className="px-4 py-3">
                     <StatusBadge status={tenant.category} />
@@ -103,7 +107,7 @@ export function TenantList() {
                 )}
                 {isUpgrade && (
                   <td className="px-4 py-3">
-                    <StatusBadge status={tenant.applied ? "通過" : "未通過"} />
+                    <StatusBadge status={tenant.applied} />
                   </td>
                 )}
                 <td className="px-4 py-3 text-right">

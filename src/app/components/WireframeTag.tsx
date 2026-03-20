@@ -60,6 +60,14 @@ export function StatusBadge({ status }: { status: string }) {
     "已繳": "bg-green-100 text-green-700 border-green-300",
     "未繳": "bg-red-100 text-red-600 border-red-300",
     "未申請": "bg-gray-100 text-gray-500 border-gray-300",
+    "租約到期": "bg-orange-100 text-orange-700 border-orange-300",
+    "即將到期": "bg-yellow-100 text-yellow-700 border-yellow-300",
+    "已到期": "bg-orange-100 text-orange-700 border-orange-300",
+    "已結束": "bg-gray-100 text-gray-500 border-gray-300",
+    "已續約": "bg-blue-100 text-blue-700 border-blue-300",
+    "已終止": "bg-red-100 text-red-600 border-red-300",
+    "承租中": "bg-green-100 text-green-700 border-green-300",
+    "待租": "bg-yellow-100 text-yellow-700 border-yellow-300",
   };
   return (
     <span className={`inline-flex px-2 py-0.5 text-xs rounded border ${styles[status] || "bg-gray-100 text-gray-600 border-gray-300"}`}>

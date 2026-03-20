@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
-  ArrowLeft, Save, Download, Plus, X, FileText, Zap, CheckCircle, ChevronRight
+  ArrowLeft, Save, Download, Plus, X, FileText, Zap, CheckCircle, ChevronRight,
+  AlertTriangle, AlertCircle, ClipboardList,
 } from "lucide-react";
 import { useVersion } from "../../context/VersionContext";
 import { activeRentals, properties, landlords, tenants } from "../../data/mockData";
@@ -9,10 +10,16 @@ import {
   FormField, UpgradeSection, StatusBadge,
   RadioGroup, FileAttachmentList, FileUploadButton,
 } from "../../components/WireframeTag";
+import { StepNavBar } from "../../components/StepNavBar";
+import { StepTabBar } from "../../components/StepTabBar";
+import { getLeaseStatus, getDaysUntilExpiry } from "./leaseUtils";
+import { StopRentalModal } from "./StopRentalModal";
+import { LeaseTerminationModal } from "./LeaseTerminationModal";
+import { LeaseRenewalModal } from "./LeaseRenewalModal";
 
 type TabId =
   | "propertyInfo" | "landlordInfo" | "condition" | "tenantInfo"
-  | "socialMatch" | "contracts" | "payments" | "attachments" | "realPrice";
+  | "socialMatch" | "contracts" | "payments" | "leaseManagement" | "attachments" | "realPrice";
 
 /* ── 契約類型 ── */
 const BASE_CONTRACT_TYPES = [
@@ -406,7 +413,16 @@ export function ActiveRentalDetail() {
   const [showContractModal, setShowContractModal] = useState(false);
   const [editingContract, setEditingContract] = useState<{ typeId: string; label: string } | null>(null);
 
-  const existingContractTypeIds = (rental?.contracts ?? []).map((c) => c.typeId);
+  // 只排除「生效中」的契約類型，已終止/已續約的同類型可重選（支援續約歷史）
+  const existingContractTypeIds = (rental?.contracts ?? [])
+    .filter((c) => c.status === "生效中")
+    .map((c) => c.typeId);
+
+  const leaseStatus = rental ? getLeaseStatus(rental) : "進行中";
+  const daysLeft = rental ? getDaysUntilExpiry(rental.endDate) : 0;
+  const [showStopModal, setShowStopModal] = useState(false);
+  const [showTerminateModal, setShowTerminateModal] = useState(false);
+  const [showRenewalModal, setShowRenewalModal] = useState(false);
 
   const tabs = [
     { id: "propertyInfo" as TabId, label: "物件資訊" },
@@ -416,6 +432,7 @@ export function ActiveRentalDetail() {
     ...(isUpgrade ? [{ id: "socialMatch" as TabId, label: "社宅媒合申請" }] : []),
     { id: "contracts" as TabId, label: "契約文件" },
     { id: "payments" as TabId, label: "繳費紀錄" },
+    { id: "leaseManagement" as TabId, label: "租約管理" },
     { id: "attachments" as TabId, label: "附加檔案" },
     { id: "realPrice" as TabId, label: "實價登錄登記" },
   ];
@@ -438,6 +455,40 @@ export function ActiveRentalDetail() {
           onClose={() => setEditingContract(null)}
         />
       )}
+      {showStopModal && rental && (
+        <StopRentalModal
+          propertyName={property?.name ?? ""}
+          tenantName={tenant?.name ?? ""}
+          landlordName={landlord?.name ?? ""}
+          startDate={rental.startDate}
+          endDate={rental.endDate}
+          onClose={() => setShowStopModal(false)}
+          onConfirm={(_date, _reason) => setShowStopModal(false)}
+        />
+      )}
+      {showTerminateModal && rental && (
+        <LeaseTerminationModal
+          propertyName={property?.name ?? ""}
+          tenantName={tenant?.name ?? ""}
+          landlordName={landlord?.name ?? ""}
+          endDate={rental.endDate}
+          onClose={() => setShowTerminateModal(false)}
+          onConfirm={(_reason) => setShowTerminateModal(false)}
+        />
+      )}
+      {showRenewalModal && rental && (
+        <LeaseRenewalModal
+          propertyName={property?.name ?? ""}
+          tenantName={tenant?.name ?? ""}
+          landlordName={landlord?.name ?? ""}
+          currentStartDate={rental.startDate}
+          currentEndDate={rental.endDate}
+          currentRent={property?.rent ?? 0}
+          currentDepositMonths={rental.depositMonths}
+          onClose={() => setShowRenewalModal(false)}
+          onConfirm={(_newEndDate, _newRent) => setShowRenewalModal(false)}
+        />
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
@@ -452,8 +503,11 @@ export function ActiveRentalDetail() {
             <h1 className="text-gray-800 text-lg">{isNew ? "新增出租中物件" : (property?.name ?? "出租中物件")}</h1>
             {!isNew && (
               <div className="flex items-center gap-2 mt-0.5">
-                <StatusBadge status="出租中" />
+                <StatusBadge status={leaseStatus === "已結束" ? "已結束" : leaseStatus === "已到期" ? "租約到期" : "出租中"} />
                 <StatusBadge status={rental?.rentalType ?? "一般租案"} />
+                {(leaseStatus === "即將到期" || leaseStatus === "已到期") && (
+                  <StatusBadge status={leaseStatus} />
+                )}
               </div>
             )}
           </div>
@@ -464,21 +518,41 @@ export function ActiveRentalDetail() {
       </div>
 
       {/* Tab Bar */}
-      <div className="flex gap-0 border-b border-gray-200 mb-5 overflow-x-auto">
-        {tabs.map((tab) => (
+      <StepTabBar
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as TabId)}
+      />
+
+      {/* ── Alert Banner ── */}
+      {!isNew && leaseStatus === "即將到期" && (
+        <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 mb-5">
+          <AlertTriangle size={16} className="text-yellow-500 flex-shrink-0" />
+          <p className="text-sm text-yellow-700 flex-1">
+            租約將於 {rental?.endDate} 到期，距今剩 <strong>{daysLeft}</strong> 天
+          </p>
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 text-sm border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === tab.id
-                ? "border-gray-800 text-gray-800 font-medium"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
+            onClick={() => setActiveTab("leaseManagement")}
+            className="flex items-center gap-1 text-xs text-yellow-700 border border-yellow-400 rounded px-2.5 py-1 hover:bg-yellow-100"
           >
-            {tab.label}
+            立即處理 <ChevronRight size={11} />
           </button>
-        ))}
-      </div>
+        </div>
+      )}
+      {!isNew && leaseStatus === "已到期" && (
+        <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 mb-5">
+          <AlertCircle size={16} className="text-orange-500 flex-shrink-0" />
+          <p className="text-sm text-orange-700 flex-1">
+            租約已於 {rental?.endDate} 到期，尚未處理
+          </p>
+          <button
+            onClick={() => setActiveTab("leaseManagement")}
+            className="flex items-center gap-1 text-xs text-orange-700 border border-orange-400 rounded px-2.5 py-1 hover:bg-orange-100"
+          >
+            立即處理 <ChevronRight size={11} />
+          </button>
+        </div>
+      )}
 
       {/* ── Tab: 物件資訊 ── */}
       {activeTab === "propertyInfo" && (
@@ -522,6 +596,11 @@ export function ActiveRentalDetail() {
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">租賃內容</h2>
+              <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 mb-5">
+                <p className="text-sm text-yellow-700">
+                  此處資訊在新增契約時會自動帶入，請確認內容正確無誤。
+                </p>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="租賃起始日" placeholder={rental?.startDate} />
                 <FormField label="租賃終止日" placeholder={rental?.endDate} />
@@ -769,6 +848,127 @@ export function ActiveRentalDetail() {
         </div>
       )}
 
+      {/* ── Tab: 租約管理 ── */}
+      {activeTab === "leaseManagement" && (
+        <div className="max-w-3xl space-y-5">
+          {/* 租賃狀態總覽 */}
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">租賃狀態</h2>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div>
+                <p className="text-xs text-gray-400">租賃起始</p>
+                <p className="text-gray-700 mt-0.5">{rental?.startDate}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">租賃終止</p>
+                <p className="text-gray-700 mt-0.5">{rental?.terminatedAt ?? rental?.endDate}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">狀態</p>
+                <div className="mt-0.5 flex items-center gap-2">
+                  <StatusBadge status={leaseStatus} />
+                  {leaseStatus === "即將到期" && (
+                    <span className="text-xs text-yellow-600">（剩 {daysLeft} 天）</span>
+                  )}
+                  {leaseStatus === "已到期" && (
+                    <span className="text-xs text-orange-600">（已過 {Math.abs(daysLeft)} 天）</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 操作區 */}
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">操作</h2>
+            {leaseStatus === "進行中" && (
+              <div className="space-y-3">
+                <div className="flex items-start gap-4 p-4 border border-red-200 rounded-lg">
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-800 font-medium">停止租賃</p>
+                    <p className="text-xs text-gray-400 mt-0.5">適用於租約期間中提前終止，需填寫終止日期與原因</p>
+                  </div>
+                  <button
+                    onClick={() => setShowStopModal(true)}
+                    className="px-4 py-2 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50 whitespace-nowrap"
+                  >
+                    停止租賃
+                  </button>
+                </div>
+              </div>
+            )}
+            {(leaseStatus === "即將到期" || leaseStatus === "已到期") && (
+              <div className="space-y-3">
+                <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300">
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-800 font-medium">續約</p>
+                    <p className="text-xs text-gray-400 mt-0.5">重新簽訂租約，更新租賃期間與租金條件</p>
+                  </div>
+                  <button
+                    onClick={() => setShowRenewalModal(true)}
+                    className="px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700 whitespace-nowrap"
+                  >
+                    續約
+                  </button>
+                </div>
+                <div className="flex items-start gap-4 p-4 border border-red-200 rounded-lg">
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-800 font-medium">不續約</p>
+                    <p className="text-xs text-gray-400 mt-0.5">確認終止租約，物件將重新開放承租人配對</p>
+                  </div>
+                  <button
+                    onClick={() => setShowTerminateModal(true)}
+                    className="px-4 py-2 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50 whitespace-nowrap"
+                  >
+                    不續約
+                  </button>
+                </div>
+              </div>
+            )}
+            {leaseStatus === "已結束" && (
+              <div className="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400">
+                <ClipboardList size={16} />
+                此案件已結束 — 唯讀模式
+              </div>
+            )}
+          </div>
+
+          {/* 租約歷史紀錄 */}
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h2 className="text-sm text-gray-700">租約歷史紀錄</h2>
+            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">契約類型</th>
+                  <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">建立日期</th>
+                  <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">狀態</th>
+                  <th className="px-4 py-3 text-right text-xs text-gray-500 font-medium"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {(rental?.contracts ?? []).map((c) => (
+                  <tr key={c.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-800">{c.type}</td>
+                    <td className="px-4 py-3 text-gray-500 text-xs">{c.createdAt}</td>
+                    <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
+                    <td className="px-4 py-3 text-right">
+                      <button className="flex items-center gap-1 text-xs text-gray-500 px-2 py-1 border border-gray-200 rounded hover:bg-gray-50 ml-auto">
+                        <Download size={11} />查看
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {(rental?.contracts ?? []).length === 0 && (
+              <div className="py-10 text-center text-gray-400 text-sm">尚無契約記錄</div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Tab: 附加檔案 ── */}
       {activeTab === "attachments" && (
         <div className="max-w-3xl space-y-6">
@@ -819,6 +1019,14 @@ export function ActiveRentalDetail() {
             <Download size={14} />下載 JSON 檔
           </button>
         </div>
+      )}
+
+      {!isNew && (
+        <StepNavBar
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={(id) => setActiveTab(id as TabId)}
+        />
       )}
     </div>
   );

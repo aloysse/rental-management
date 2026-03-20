@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, Download, Save, Trash2, Plus, X } from "lucide-react";
 import { useVersion } from "../../context/VersionContext";
 import { tenants, coResidents, properties, activeRentals } from "../../data/mockData";
+import { getLeaseStatus } from "../active-rentals/leaseUtils";
 import { FormField, UpgradeSection, ImageUploadBox, StatusBadge, FileAttachmentList, FileUploadButton } from "../../components/WireframeTag";
 
 type TabId = "info" | "socialApp" | "attachments" | "matching";
@@ -83,8 +84,10 @@ export function TenantDetail() {
   // 承租中案件：此承租人的 activeRentals
   const myActiveRentals = activeRentals.filter((ar) => ar.tenantId === tenant?.id);
 
-  // 配對案件：符合過濾條件的委託出租物件 (尚未被配對)
-  const activeRentalPropertyIds = new Set(activeRentals.map((ar) => ar.propertyId));
+  // 配對案件：只排除在進行中（非已結束）租案中的物件
+  const activeRentalPropertyIds = new Set(
+    activeRentals.filter((ar) => !ar.terminatedAt).map((ar) => ar.propertyId)
+  );
   const matchedProperties = properties.filter((p) =>
     p.rent >= filters.minRent &&
     p.rent <= filters.maxRent &&
@@ -127,8 +130,11 @@ export function TenantDetail() {
           </button>
           <div>
             <h1 className="text-gray-800 text-lg">{isNew ? "新增承租人" : tenant?.name}</h1>
-            {!isNew && isUpgrade && (
-              <p className="text-xs text-gray-400 mt-0.5">編號：{tenant?.id}</p>
+            {!isNew && (
+              <div className="flex items-center gap-2 mt-0.5">
+                {tenant?.rentalStatus && <StatusBadge status={tenant.rentalStatus} />}
+                {isUpgrade && <p className="text-xs text-gray-400">編號：{tenant?.id}</p>}
+              </div>
             )}
           </div>
         </div>
@@ -215,16 +221,21 @@ export function TenantDetail() {
               </div>
             </div>
 
-            {/* 承租中案件 */}
+            {/* 租賃案件紀錄 */}
             {!isNew && (
               <div className="bg-white border border-gray-200 rounded-lg p-5">
-                <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">承租中案件</h2>
+                <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">租賃案件紀錄</h2>
                 {myActiveRentals.length === 0 ? (
-                  <p className="text-sm text-gray-400 py-2 text-center">目前無承租中案件</p>
+                  <p className="text-sm text-gray-400 py-2 text-center">目前無租賃案件</p>
                 ) : (
                   <div className="space-y-2">
                     {myActiveRentals.map((ar) => {
                       const p = properties.find((prop) => prop.id === ar.propertyId);
+                      const ls = getLeaseStatus(ar);
+                      const badgeStatus = ar.terminatedAt ? "已結束"
+                        : ls === "已到期" ? "已到期"
+                        : ls === "即將到期" ? "即將到期"
+                        : "出租中";
                       return (
                         <div
                           key={ar.id}
@@ -235,7 +246,7 @@ export function TenantDetail() {
                             <p className="text-sm text-gray-800">{p?.name}</p>
                             <p className="text-xs text-gray-400 mt-0.5">{ar.startDate} ~ {ar.endDate}</p>
                           </div>
-                          <StatusBadge status="出租中" />
+                          <StatusBadge status={badgeStatus} />
                         </div>
                       );
                     })}
@@ -324,6 +335,16 @@ export function TenantDetail() {
       {/* ── Tab: 配對案件 ── */}
       {activeTab === "matching" && (
         <div className="space-y-4">
+          {tenant?.rentalStatus === "承租中" && (
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-700">
+              此承租人目前承租中，如需換租請先辦理停止租賃或不續約。
+            </div>
+          )}
+          {tenant?.rentalStatus === "待租" && (
+            <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-600">
+              此承租人租約已終止，可重新配對物件。
+            </div>
+          )}
           <div>
             <h2 className="text-sm text-gray-700">符合條件的委託出租物件</h2>
             <p className="text-xs text-gray-400 mt-0.5">依租金與地區自動配對</p>
