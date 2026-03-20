@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
-  ArrowLeft, Save, Trash2, Download, Plus, X, FileText, ExternalLink, Zap
+  ArrowLeft, Trash2, Download, Plus, X, FileText, ExternalLink, Zap
 } from "lucide-react";
 import { useVersion } from "../../context/VersionContext";
 import { properties, landlords, tenants, activeRentals } from "../../data/mockData";
@@ -11,6 +11,8 @@ import {
 } from "../../components/WireframeTag";
 import { StepNavBar } from "../../components/StepNavBar";
 import { StepTabBar } from "../../components/StepTabBar";
+import { ContractTypeModal } from "../../components/ContractTypeModal";
+import { DelegationContractEditDialog } from "../../components/ContractEditDialog";
 
 type TabId = "propertyInfo" | "landlordInfo" | "condition" | "socialApp" | "contract" | "attachments" | "matching";
 
@@ -63,16 +65,6 @@ function HistoryRentalSection({ historyRentals, onNavigate }: {
     </div>
   );
 }
-
-/* ── 委託契約類型 ── */
-const DELEGATION_TYPES = [
-  { id: "general-delegation", label: "一般租案委託約", desc: "一般住宅出租委託" },
-];
-const UPGRADE_DELEGATION_TYPES = [
-  { id: "social-rent-delegation", label: "社宅委託租賃", desc: "社會住宅委託租賃" },
-  { id: "social-lease", label: "社宅包租", desc: "社會住宅包租模式" },
-  { id: "social-management", label: "社宅委託管理", desc: "社會住宅委託管理" },
-];
 
 const RENT_INCLUDE_OPTIONS = ["管理費", "清潔費", "第四台", "網路", "水費", "電費", "瓦斯費"];
 const LIVING_FEATURE_OPTIONS = ["近便利商店", "近傳統市場", "近百貨公司", "近公園綠地", "近學校", "近醫療機構", "近夜市"];
@@ -198,209 +190,6 @@ function PhotoUploadCard({ title, count = 0 }: { title: string; count?: number }
         新增照片
       </button>
       <p className="text-xs text-gray-400">已上傳 {count} 張</p>
-    </div>
-  );
-}
-
-/* ── 委託契約類型選擇 Modal ── */
-function DelegationContractModal({ onClose, existingTypeIds, onSelect }: {
-  onClose: () => void;
-  existingTypeIds: string[];
-  onSelect: (typeId: string, label: string) => void;
-}) {
-  const { isUpgrade } = useVersion();
-  const [selected, setSelected] = useState<string | null>(null);
-  const allTypes = [...DELEGATION_TYPES, ...(isUpgrade ? UPGRADE_DELEGATION_TYPES : [])];
-  const selectedLabel = allTypes.find((t) => t.id === selected)?.label ?? "";
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-2xl w-[520px] max-h-[70vh] flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <div>
-            <h2 className="text-gray-800">選擇委託契約類型</h2>
-            <p className="text-xs text-gray-400 mt-0.5">已使用的類別將標記說明</p>
-          </div>
-          <button onClick={onClose} className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600">
-            <X size={18} />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
-          {DELEGATION_TYPES.map((type) => {
-            const isUsed = existingTypeIds.includes(type.id);
-            return (
-              <button
-                key={type.id}
-                disabled={isUsed}
-                onClick={() => setSelected(type.id)}
-                className={`w-full flex items-center gap-3 p-3.5 rounded-lg border text-left transition-all ${
-                  isUsed ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-50" :
-                  selected === type.id ? "border-gray-800 bg-gray-50 ring-1 ring-gray-800" :
-                  "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${selected === type.id && !isUsed ? "bg-gray-800" : "bg-gray-100"}`}>
-                  <FileText size={15} className={selected === type.id && !isUsed ? "text-white" : "text-gray-500"} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-700">{type.label}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{type.desc}</p>
-                </div>
-                {isUsed
-                  ? <span className="text-xs text-gray-400 bg-gray-100 rounded px-1.5 py-0.5">已使用</span>
-                  : <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${selected === type.id ? "border-gray-800 bg-gray-800" : "border-gray-300"}`}>{selected === type.id && <div className="w-full h-full flex items-center justify-center"><div className="w-1.5 h-1.5 rounded-full bg-white" /></div>}</div>
-                }
-              </button>
-            );
-          })}
-          {isUpgrade && (
-            <>
-              <div className="flex items-center gap-2 pt-2 pb-1">
-                <div className="flex-1 h-px bg-amber-200" />
-                <span className="flex items-center gap-1 text-xs text-amber-600 px-1"><Zap size={11} />升級版專屬</span>
-                <div className="flex-1 h-px bg-amber-200" />
-              </div>
-              {UPGRADE_DELEGATION_TYPES.map((type) => {
-                const isUsed = existingTypeIds.includes(type.id);
-                return (
-                  <button
-                    key={type.id}
-                    disabled={isUsed}
-                    onClick={() => setSelected(type.id)}
-                    className={`w-full flex items-center gap-3 p-3.5 rounded-lg border text-left transition-all ${
-                      isUsed ? "opacity-50 cursor-not-allowed border-amber-200 bg-amber-50/40" :
-                      selected === type.id ? "border-amber-500 bg-amber-50 ring-1 ring-amber-400" :
-                      "border-amber-200 bg-amber-50/40 hover:border-amber-300 hover:bg-amber-50"
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${selected === type.id && !isUsed ? "bg-amber-500" : "bg-amber-100"}`}>
-                      <FileText size={15} className={selected === type.id && !isUsed ? "text-white" : "text-amber-600"} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-700">{type.label}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{type.desc}</p>
-                    </div>
-                    {isUsed
-                      ? <span className="text-xs text-amber-600 bg-amber-100 rounded px-1.5 py-0.5">已使用</span>
-                      : <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${selected === type.id ? "border-amber-500 bg-amber-500" : "border-amber-300"}`}>{selected === type.id && <div className="w-full h-full flex items-center justify-center"><div className="w-1.5 h-1.5 rounded-full bg-white" /></div>}</div>
-                    }
-                  </button>
-                );
-              })}
-            </>
-          )}
-        </div>
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-100">取消</button>
-          <button
-            disabled={!selected}
-            onClick={() => selected && onSelect(selected, selectedLabel)}
-            className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            建立契約
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── 契約編輯 Dialog (4步驟) ── */
-function ContractEditDialog({ contractType, onClose }: { contractType: string; onClose: () => void }) {
-  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
-  const steps = ["基本資訊", "租賃條款", "特約事項", "確認完成"];
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-2xl w-[680px] max-h-[85vh] flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <div>
-            <h2 className="text-gray-800">{contractType}</h2>
-            <div className="flex items-center gap-2 mt-1.5">
-              {steps.map((s, i) => (
-                <div key={i} className={`flex items-center ${i < steps.length - 1 ? "gap-2" : ""}`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step >= i ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-400"}`}>{i + 1}</div>
-                  {i < steps.length - 1 && <div className={`w-6 h-px ${step > i ? "bg-gray-800" : "bg-gray-200"}`} />}
-                </div>
-              ))}
-              <span className="text-xs text-gray-400 ml-1">{steps[step]}</span>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-1.5 rounded hover:bg-gray-100 text-gray-400"><X size={18} /></button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          {step === 0 && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2"><FormField label="案件名稱" required /></div>
-              <FormField label="起始日期" type="text" placeholder="YYYY-MM-DD" />
-              <FormField label="終止日期" type="text" placeholder="YYYY-MM-DD" />
-              <FormField label="月租金" />
-              <FormField label="押金月數" type="select" placeholder="請選擇" />
-            </div>
-          )}
-          {step === 1 && (
-            <div className="space-y-4">
-              <FormField label="付款方式" type="select" placeholder="請選擇" />
-              <FormField label="水費分擔" type="select" placeholder="請選擇" />
-              <FormField label="電費分擔" type="select" placeholder="請選擇" />
-              <FormField label="瓦斯費分擔" type="select" placeholder="請選擇" />
-              <FormField label="管理費分擔" type="select" placeholder="請選擇" />
-            </div>
-          )}
-          {step === 2 && (
-            <div className="space-y-4">
-              {["飼養寵物", "轉租", "裝修"].map((item) => (
-                <div key={item} className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-700">{item}</span>
-                  <div className="flex gap-3">
-                    {["允許", "不允許", "協議"].map((opt) => (
-                      <label key={opt} className="flex items-center gap-1.5 text-xs text-gray-600">
-                        <input type="radio" name={item} className="w-3 h-3" defaultChecked={opt === "不允許"} readOnly />
-                        {opt}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <FormField label="其他特約事項" type="textarea" />
-            </div>
-          )}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 leading-7">
-                <p className="font-medium text-gray-800 mb-3">委託契約書預覽</p>
-                <p>委託人（甲方）與受託人（乙方），就下列不動產之租賃委託，訂立本契約，雙方同意遵守下列條款...</p>
-                <p className="mt-3 text-gray-400 text-xs">（契約內容依實際填寫資料生成）</p>
-              </div>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input type="checkbox" className="w-4 h-4" readOnly />
-                我已閱讀並同意上述委託契約書條款
-              </label>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <div>
-            {step > 0 && (
-              <button onClick={() => setStep((s) => (s - 1) as 0 | 1 | 2 | 3)} className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-100">上一步</button>
-            )}
-          </div>
-          <div className="flex gap-3">
-            {step === 3 ? (
-              <>
-                <button className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded text-gray-600 hover:bg-gray-50">
-                  <Download size={14} />下載 PDF
-                </button>
-                <button onClick={onClose} className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700">儲存並關閉</button>
-              </>
-            ) : (
-              <button onClick={() => setStep((s) => (s + 1) as 0 | 1 | 2 | 3)} className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700">下一步</button>
-            )}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -544,6 +333,10 @@ export function PropertyDetail() {
     { id: "matching" as TabId, label: "承租人配對" },
   ];
 
+  const activeTabIndex = tabs.findIndex((t) => t.id === activeTab);
+  const landlordInfoIndex = tabs.findIndex((t) => t.id === "landlordInfo");
+  const showConvertButton = !isNew || activeTabIndex > landlordInfoIndex;
+
   const existingContractTypeIds = (property?.delegationContracts ?? []).map((c) => c.typeId);
   const propertyInfo = property?.propertyInfo;
   const rentalAddress = propertyInfo?.rentalAddress;
@@ -581,7 +374,8 @@ export function PropertyDetail() {
         />
       )}
       {showContractModal && (
-        <DelegationContractModal
+        <ContractTypeModal
+          mode="delegation"
           onClose={() => setShowContractModal(false)}
           existingTypeIds={existingContractTypeIds}
           onSelect={(typeId, label) => {
@@ -591,7 +385,7 @@ export function PropertyDetail() {
         />
       )}
       {editingContract && (
-        <ContractEditDialog
+        <DelegationContractEditDialog
           contractType={editingContract.label}
           onClose={() => setEditingContract(null)}
         />
@@ -635,9 +429,14 @@ export function PropertyDetail() {
               <Trash2 size={14} />刪除
             </button>
           )}
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
-            <Save size={14} />{isNew ? "建立" : "儲存"}
-          </button>
+          {showConvertButton && (
+            <button
+              onClick={() => navigate("/active-rentals/AR001")}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700"
+            >
+              轉出租中物件
+            </button>
+          )}
         </div>
       </div>
 
@@ -1115,11 +914,6 @@ export function PropertyDetail() {
                             <p className="text-sm text-gray-700">{group.label}</p>
                             {"subtitle" in group && group.subtitle && <p className="text-xs text-gray-500 mt-0.5">{group.subtitle}</p>}
                           </div>
-                          {groupUploaded && (
-                            <span className="inline-flex px-2 py-0.5 text-xs rounded border bg-emerald-50 text-emerald-700 border-emerald-200">
-                              已檢附
-                            </span>
-                          )}
                         </div>
 
                         <div className="space-y-2">
@@ -1156,7 +950,7 @@ export function PropertyDetail() {
                   const groupUploaded = group.items.some((item) => isSocialDocumentUploaded(item.keywords));
                   return (
                     <div key={group.id} className="border border-gray-100 rounded-lg p-3">
-                      <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2">
                         <div>
                           <h3 className="text-sm text-gray-700">{`${groupIndex + 1}. ${group.label}`}</h3>
                           {"subtitle" in group && group.subtitle && <p className="text-xs text-gray-500 mt-0.5">{group.subtitle}</p>}

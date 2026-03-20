@@ -134,7 +134,8 @@ const baseProperties = [
     socialHousingApp: { landlordCode: "住通台北B2H00001", virtualCode: "K8mQ2zP4L" },
     attachments: [
       { id: "PA001-1", name: "建物謄本.pdf", fileType: "PDF" },
-      { id: "PA001-2", name: "物件照片.jpg", fileType: "JPG" },
+      { id: "PA004-3", name: "身分證正面.jpg", fileType: "jpg" },
+      { id: "PA004-4", name: "身分證反面.jpg", fileType: "jpg" },
     ],
     delegationContracts: [
       { id: "DC001", type: "一般租案委託約", typeId: "general-delegation", status: "生效中", createdAt: "2024-01-02" },
@@ -258,6 +259,8 @@ const baseProperties = [
     attachments: [
       { id: "PA004-1", name: "社宅申請書.pdf", fileType: "PDF" },
       { id: "PA004-2", name: "建物謄本.pdf", fileType: "PDF" },
+      { id: "PA004-3", name: "身分證正面.jpg", fileType: "jpg" },
+      { id: "PA004-4", name: "身分證反面.jpg", fileType: "jpg" },
     ],
     delegationContracts: [
       { id: "DC003", type: "社宅包租", typeId: "social-lease", status: "生效中", createdAt: "2024-06-01" },
