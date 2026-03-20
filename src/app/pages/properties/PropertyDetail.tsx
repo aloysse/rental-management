@@ -81,12 +81,43 @@ const TENANT_REQUIREMENT_OPTIONS = ["學生", "上班族", "家庭"];
 
 const SOCIAL_DOCUMENT_GROUPS = [
   {
+    id: "identityProof",
+    label: "身分證明文件",
+    items: [
+      { id: "naturalPersonIdCopy", label: "國民身分證正反面影本（自然人）", note: "申請人為未成年者，得以戶口名簿或戶籍謄本替代", keywords: ["身分證"] },
+      { id: "corporateRegistrationCopy", label: "公司登記事項表影本（私法人）", keywords: ["登記事項"] },
+      { id: "agentIdCopy", label: "代理人國民身分證正反面影本", keywords: ["代理人", "身分證"] },
+    ],
+  },
+  {
     id: "buildingProof",
     label: "建物證明文件",
     items: [
+      { id: "firstBuildingTranscript", label: "第一類建物謄本（必要）", keywords: ["第一類建物謄本", "建物謄本"] },
       { id: "buildingOwnershipCopy", label: "建物所有權狀影本", keywords: ["所有權狀", "建物謄本"] },
       { id: "buildingUsePermitCopy", label: "建築使用執照影本", keywords: ["使用執照"] },
       { id: "surveyResultCopy", label: "測量成果圖影本", keywords: ["測量成果"] },
+    ],
+  },
+  {
+    id: "privacyConsent",
+    label: "個資同意書",
+    items: [
+      { id: "privacyConsentDoc", label: "個人資料蒐集、處理及利用告知暨同意書（當事人簽章）", keywords: ["個資同意", "同意書"] },
+    ],
+  },
+  {
+    id: "safetyChecklist",
+    label: "檢核表",
+    items: [
+      { id: "safetyChecklistDoc", label: "屋況及租屋安全檢核表（出租人簽章）", keywords: ["檢核表", "屋況"] },
+    ],
+  },
+  {
+    id: "bankInfo",
+    label: "匯款資訊",
+    items: [
+      { id: "bankbookCopy", label: "出租人存摺影本", note: "須包含戶名、金融機構/分行名稱及代碼、帳戶號碼", keywords: ["存摺"] },
     ],
   },
   {
