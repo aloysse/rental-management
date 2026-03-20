@@ -25,4 +25,6 @@ export const router = createBrowserRouter([
       { path: "active-rentals/:id", Component: ActiveRentalDetail },
     ],
   },
-]);
+], {
+  basename: import.meta.env.BASE_URL,
+});
