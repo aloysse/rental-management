@@ -9,7 +9,7 @@ export const activeRentals = [
     endDate: "2026-05-03",  // 即將到期（距今 44 天）
     depositMonths: 2,
     agentName: "張業務",
-    socialHousingMatch: { applicationType: "代租", landlordCode: "LL001", tenantCode: "TT001" },
+    socialHousingMatch: { applicationType: "代租", landlordCode: "B2M00001", virtualCode: "N4xK7pQ2M", tenantCode: "TT001" },
     contracts: [
       { id: "AC001", type: "住宅租賃契約書", typeId: "residential", version: "", status: "生效中", createdAt: "2024-01-05" },
     ],
@@ -36,7 +36,7 @@ export const activeRentals = [
     terminationReason: "承租人不續約",
     depositMonths: 1,
     agentName: "張業務",
-    socialHousingMatch: { applicationType: "包租", landlordCode: "LL002", tenantCode: "TT002" },
+    socialHousingMatch: { applicationType: "包租", landlordCode: "B2M00002", virtualCode: "B9vT3mL8R", tenantCode: "TT002" },
     contracts: [
       { id: "AC002", type: "住宅租賃契約書", typeId: "residential", version: "", status: "已終止", createdAt: "2024-03-02" },
     ],
@@ -57,7 +57,7 @@ export const activeRentals = [
     endDate: "2026-05-31",  // 進行中（距今 72 天）
     depositMonths: 2,
     agentName: "王業務",
-    socialHousingMatch: { applicationType: "包租", landlordCode: "LL003", tenantCode: "TT003" },
+    socialHousingMatch: { applicationType: "包租", landlordCode: "B2M00003", virtualCode: "C5rW1zH6P", tenantCode: "TT003" },
     contracts: [
       { id: "AC003", type: "住宅租賃契約書", typeId: "residential", status: "生效中", createdAt: "2024-06-05" },
     ],
@@ -79,7 +79,7 @@ export const activeRentals = [
     endDate: "2026-08-31",  // 進行中
     depositMonths: 2,
     agentName: "李業務",
-    socialHousingMatch: { applicationType: "代租", landlordCode: "LL004", tenantCode: "TT004" },
+    socialHousingMatch: { applicationType: "代租", landlordCode: "B2M00004", virtualCode: "F2nY8qD4S", tenantCode: "TT004" },
     contracts: [
       { id: "AC004", type: "住宅租賃契約書", typeId: "residential", status: "生效中", createdAt: "2024-09-03" },
     ],
@@ -101,7 +101,7 @@ export const activeRentals = [
     endDate: "2026-01-31",  // 已到期（距今 -49 天），尚未處理
     depositMonths: 2,
     agentName: "王業務",
-    socialHousingMatch: { applicationType: "代租", landlordCode: "LL003", tenantCode: "TT005" },
+    socialHousingMatch: { applicationType: "代租", landlordCode: "B2M00003", virtualCode: "J7kP3cV9T", tenantCode: "TT005" },
     contracts: [
       { id: "AC005", type: "住宅租賃契約書", typeId: "residential", status: "生效中", createdAt: "2025-02-03" },
     ],

@@ -137,7 +137,7 @@ export function PropertyList() {
                 onClick={() => navigate(`/properties/${property.id}`)}
               >
                 {isUpgrade && (
-                  <td className="px-4 py-3 text-gray-500 text-xs font-mono">{property.caseNo}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs font-mono">{property.socialHousingApp.landlordCode}</td>
                 )}
                 <td className="px-4 py-3">
                   <span className="text-gray-800">{property.name}</span>

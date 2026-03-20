@@ -52,7 +52,51 @@ function createPropertyInfo(overrides: Partial<typeof defaultPropertyInfo> = {})
   };
 }
 
-export const properties = [
+const CONDITION_APPLIANCE_ITEMS = [
+  "電視",
+  "冷氣",
+  "冰箱",
+  "熱水器",
+  "洗衣機",
+  "微波爐",
+  "洗碗機",
+  "排油煙機",
+  "瓦斯爐",
+  "其他",
+];
+
+const CONDITION_FURNITURE_ITEMS = [
+  "鞋櫃",
+  "餐桌",
+  "餐桌椅",
+  "沙發",
+  "電視櫃",
+  "茶几",
+  "床組(頭)",
+  "衣櫃",
+  "置物櫃",
+  "梳妝台",
+  "書櫃",
+  "書桌",
+  "書桌椅",
+  "其他",
+];
+
+const REQUIRED_PHOTO_ITEMS = [
+  "門牌及大門",
+  "衛浴設備（馬桶、洗面盆及浴缸或淋浴）",
+  "出入口及樓梯間",
+  "滅火器（必要且在有效期限內）/獨立型偵煙器/火警警報器",
+  "熱水器",
+  "室內設備（自行選擇對租金有影響之設備）",
+];
+
+const OPTIONAL_PHOTO_ITEMS = [
+  "漏水處（如有漏水情形，必須檢附）",
+  "其他",
+];
+
+const baseProperties = [
   {
     id: "P001", caseNo: "住通台北B2T00001", name: "中正一號",
     address: "台北市中正區忠孝東路1段1號3樓", district: "台北市中正區",
@@ -60,7 +104,7 @@ export const properties = [
     applied: true, floor: 3, type: "套房",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "台北市", district: "中正區", street: "忠孝東路1段", number: "1號", hideDoorplate: false },
+      rentalAddress: { city: "台北市", district: "中正區", street: "忠孝東路1段", lane: "", alley: "", number: "1號", subNumber: "", hideDoorplate: false },
       rentalFloor: "3樓",
       totalFloors: 12,
       communityName: "中正學府",
@@ -87,7 +131,7 @@ export const properties = [
       appliances: { ac: true, waterHeater: true, fridge: true, washer: false, gasStove: false, inductionCooker: true, internet: true, cableTV: false },
       socialCheck: { seaSand: false, radiation: false, fireExtinguisher: true, fireInspection: true },
     },
-    socialHousingApp: { landlordCode: "LL001", virtualCode: "VC-P001" },
+    socialHousingApp: { landlordCode: "住通台北B2H00001", virtualCode: "K8mQ2zP4L" },
     attachments: [
       { id: "PA001-1", name: "建物謄本.pdf", fileType: "PDF" },
       { id: "PA001-2", name: "物件照片.jpg", fileType: "JPG" },
@@ -103,7 +147,7 @@ export const properties = [
     applied: false, floor: 5, type: "一房一廳",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "台北市", district: "中正區", street: "忠孝東路1段", number: "3號", hideDoorplate: false },
+      rentalAddress: { city: "台北市", district: "中正區", street: "忠孝東路1段", lane: "", alley: "", number: "3號", subNumber: "", hideDoorplate: false },
       rentalFloor: "5樓",
       totalFloors: 14,
       communityName: "忠孝匯",
@@ -141,7 +185,7 @@ export const properties = [
     applied: true, floor: 2, type: "兩房一廳",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "新北市", district: "板橋區", street: "文化路二段", number: "15號", hideDoorplate: false },
+      rentalAddress: { city: "新北市", district: "板橋區", street: "文化路二段", lane: "", alley: "", number: "15號", subNumber: "", hideDoorplate: false },
       rentalFloor: "2樓",
       totalFloors: 10,
       communityName: "板橋文化苑",
@@ -168,7 +212,7 @@ export const properties = [
       appliances: { ac: true, waterHeater: true, fridge: true, washer: true, gasStove: true, inductionCooker: false, internet: true, cableTV: true },
       socialCheck: { seaSand: false, radiation: false, fireExtinguisher: true, fireInspection: true },
     },
-    socialHousingApp: { landlordCode: "LL002", virtualCode: "VC-P003" },
+    socialHousingApp: { landlordCode: "住通台北B2H00002", virtualCode: "R3tN7aX5C" },
     attachments: [
       { id: "PA003-1", name: "建物謄本.pdf", fileType: "PDF" },
     ],
@@ -183,7 +227,7 @@ export const properties = [
     applied: true, floor: 10, type: "三房兩廳",
     rentalType: "社宅包租案", agentName: "王業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "台北市", district: "大安區", street: "信義路四段", number: "88號", hideDoorplate: true },
+      rentalAddress: { city: "台北市", district: "大安區", street: "信義路四段", lane: "", alley: "", number: "88號", subNumber: "", hideDoorplate: true },
       rentalFloor: "10樓",
       totalFloors: 15,
       communityName: "大安帝景",
@@ -210,7 +254,7 @@ export const properties = [
       appliances: { ac: true, waterHeater: true, fridge: true, washer: true, gasStove: true, inductionCooker: false, internet: true, cableTV: true },
       socialCheck: { seaSand: false, radiation: false, fireExtinguisher: true, fireInspection: true },
     },
-    socialHousingApp: { landlordCode: "LL003", virtualCode: "VC-P004" },
+    socialHousingApp: { landlordCode: "住通台北B2H00003", virtualCode: "V9bH4mT2Q" },
     attachments: [
       { id: "PA004-1", name: "社宅申請書.pdf", fileType: "PDF" },
       { id: "PA004-2", name: "建物謄本.pdf", fileType: "PDF" },
@@ -226,7 +270,7 @@ export const properties = [
     applied: false, floor: 8, type: "兩房一廳",
     rentalType: "一般租案", agentName: "王業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "台北市", district: "大安區", street: "敦化南路二段", number: "20號", hideDoorplate: false },
+      rentalAddress: { city: "台北市", district: "大安區", street: "敦化南路二段", lane: "", alley: "", number: "20號", subNumber: "", hideDoorplate: false },
       rentalFloor: "8樓",
       totalFloors: 12,
       communityName: "大安雅居",
@@ -264,7 +308,7 @@ export const properties = [
     applied: true, floor: 4, type: "套房",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "台北市", district: "內湖區", street: "民權東路六段", number: "108號", hideDoorplate: false },
+      rentalAddress: { city: "台北市", district: "內湖區", street: "民權東路六段", lane: "", alley: "", number: "108號", subNumber: "", hideDoorplate: false },
       rentalFloor: "4樓",
       totalFloors: 9,
       communityName: "內湖綠境",
@@ -291,7 +335,7 @@ export const properties = [
       appliances: { ac: true, waterHeater: true, fridge: true, washer: false, gasStove: false, inductionCooker: false, internet: true, cableTV: false },
       socialCheck: { seaSand: false, radiation: false, fireExtinguisher: true, fireInspection: true },
     },
-    socialHousingApp: { landlordCode: "LL004", virtualCode: "VC-P006" },
+    socialHousingApp: { landlordCode: "住通台北B2H00004", virtualCode: "W6pJ1cD8R" },
     attachments: [
       { id: "PA006-1", name: "身分證影本.pdf", fileType: "PDF" },
     ],
@@ -306,7 +350,7 @@ export const properties = [
     applied: false, floor: 6, type: "一房一廳",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "台北市", district: "中正區", street: "重慶南路一段", number: "57號", hideDoorplate: true },
+      rentalAddress: { city: "台北市", district: "中正區", street: "重慶南路一段", lane: "", alley: "", number: "57號", subNumber: "", hideDoorplate: true },
       rentalFloor: "6樓",
       totalFloors: 11,
       communityName: "中正精選",
@@ -344,7 +388,7 @@ export const properties = [
     applied: false, floor: 5, type: "兩房一廳",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "新北市", district: "板橋區", street: "新站路", number: "99號", hideDoorplate: false },
+      rentalAddress: { city: "新北市", district: "板橋區", street: "新站路", lane: "", alley: "", number: "99號", subNumber: "", hideDoorplate: false },
       rentalFloor: "5樓",
       totalFloors: 13,
       communityName: "板橋新苑",
@@ -382,7 +426,7 @@ export const properties = [
     applied: false, floor: 3, type: "套房",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "台北市", district: "內湖區", street: "瑞光路", number: "258號", hideDoorplate: false },
+      rentalAddress: { city: "台北市", district: "內湖區", street: "瑞光路", lane: "", alley: "", number: "258號", subNumber: "", hideDoorplate: false },
       rentalFloor: "3樓",
       totalFloors: 8,
       communityName: "內湖安居",
@@ -420,7 +464,7 @@ export const properties = [
     applied: false, floor: 4, type: "套房",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
-      rentalAddress: { city: "桃園市", district: "中壢區", street: "中央西路一段", number: "120號", hideDoorplate: false },
+      rentalAddress: { city: "桃園市", district: "中壢區", street: "中央西路一段", lane: "", alley: "", number: "120號", subNumber: "", hideDoorplate: false },
       rentalFloor: "4樓",
       totalFloors: 10,
       communityName: "中壢溫馨宅",
@@ -452,3 +496,143 @@ export const properties = [
     delegationContracts: [],
   },
 ];
+
+export const properties = baseProperties.map((property, index) => {
+  const appliances = property.houseCondition?.appliances ?? {};
+  const hasLeakIssue = index === 1 || index === 8;
+  const hasCarParking = !!property.houseCondition?.parking;
+  const hasScooterParking = index % 2 === 0;
+
+  return {
+    ...property,
+    conditionForm: {
+      surveyDate: index === 0 ? "114年03月18日" : "",
+      buildingDoorplate: {
+        city: property.propertyInfo?.rentalAddress?.city ?? "",
+        district: property.propertyInfo?.rentalAddress?.district ?? "",
+        road: property.propertyInfo?.rentalAddress?.street ?? "",
+        section: "",
+        lane: property.propertyInfo?.rentalAddress?.lane ?? "",
+        alley: property.propertyInfo?.rentalAddress?.alley ?? "",
+        number: property.propertyInfo?.rentalAddress?.number ?? "",
+        floor: property.propertyInfo?.rentalFloor ?? `${property.floor ?? ""}樓`,
+        floorSub: property.propertyInfo?.rentalSubFloor ?? "",
+      },
+      basicRequirements: {
+        escapeRouteClear: true,
+        seaSand: {
+          isSeaSand: !!property.houseCondition?.socialCheck?.seaSand,
+          tested: true,
+          testResult: property.houseCondition?.socialCheck?.seaSand ? "不合格" : "合格",
+          qualified: !property.houseCondition?.socialCheck?.seaSand,
+          handling: property.houseCondition?.socialCheck?.seaSand ? "由出租人修繕後交屋" : "",
+        },
+        radiation: {
+          isRadiation: !!property.houseCondition?.socialCheck?.radiation,
+          tested: true,
+          testResult: property.houseCondition?.socialCheck?.radiation ? "不合格" : "合格",
+          qualified: !property.houseCondition?.socialCheck?.radiation,
+          handling: property.houseCondition?.socialCheck?.radiation ? "由出租人修繕後交屋" : "",
+        },
+        fireDevices: {
+          extinguisher: !!property.houseCondition?.socialCheck?.fireExtinguisher,
+          smokeDetector: index % 3 !== 1,
+          fireAlarm: index % 3 === 0,
+        },
+        hasBathroomFacilities: true,
+        waterHeater: {
+          hasWaterHeater: !!appliances.waterHeater,
+          type: appliances.waterHeater ? (index % 2 === 0 ? "瓦斯熱水器" : "電熱水器") : "",
+          location: index % 2 === 0 ? "室外" : "室內",
+          hasExhaustPipe: true,
+          compliant: true,
+        },
+      },
+      management: {
+        hasCommittee: index % 4 !== 0,
+        hasManagementFee: index % 4 !== 0,
+        managementFeePerPing: index % 4 !== 0 ? 85 : null,
+        managementFeeMonthly: property.propertyInfo?.managementFee ?? null,
+        hasCommunityRules: true,
+        hasRegularFireInspection: !!property.houseCondition?.socialCheck?.fireInspection,
+        parking: {
+          car: {
+            hasParking: hasCarParking,
+            hasIndependentTitle: hasCarParking && index % 2 === 0,
+            style: hasCarParking ? "坡道平面" : "",
+            levelType: hasCarParking ? "地下" : "",
+            level: hasCarParking ? 2 : null,
+            unitNo: hasCarParking ? `B2-${(index + 1).toString().padStart(2, "0")}` : "",
+            hasAgreementDoc: hasCarParking && index % 2 === 0,
+            monthlyFee: hasCarParking ? 2500 : null,
+          },
+          scooter: {
+            hasParking: hasScooterParking,
+            levelType: hasScooterParking ? "地下" : "",
+            level: hasScooterParking ? 1 : null,
+            unitNo: hasScooterParking ? `M-${(index + 11).toString().padStart(3, "0")}` : "",
+            monthlyFee: hasScooterParking ? 300 : null,
+          },
+        },
+      },
+      conditionStatus: {
+        noWaterLeak: !hasLeakIssue,
+        hasWaterLeak: hasLeakIssue,
+        leakLocation: hasLeakIssue ? "主臥窗框、客廳天花板" : "",
+        leakHandling: hasLeakIssue ? "由出租人修繕後交屋" : "",
+        buildingType: {
+          generalBuilding: index % 2 === 0 ? "透天厝" : "其他",
+          dividedOwnership: index % 2 === 0 ? "住宅大樓" : "公寓",
+          specialBuilding: "",
+        },
+        rentalPattern: {
+          mode: property.type === "套房" ? "獨立套房" : "整棟（戶）出租",
+          rooms: property.propertyInfo?.layout?.rooms ?? 1,
+          livingRooms: property.propertyInfo?.layout?.livingRooms ?? 1,
+          bathrooms: property.propertyInfo?.layout?.bathrooms ?? 1,
+        },
+        waterDrainage: {
+          status: "正常",
+          repairBy: "出租人",
+        },
+        nonNaturalDeath: {
+          duringOwnership: "無",
+          beforeOwnership: "確認無上述情事",
+        },
+        accessoryItems: {
+          facility: {
+            naturalGas: !!appliances.gasStove,
+            cableTV: !!appliances.cableTV,
+            internet: !!appliances.internet,
+          },
+          appliances: CONDITION_APPLIANCE_ITEMS.map((name) => ({
+            name,
+            quantity:
+              name === "冷氣" ? (appliances.ac ? 1 : 0) :
+              name === "熱水器" ? (appliances.waterHeater ? 1 : 0) :
+              name === "冰箱" ? (appliances.fridge ? 1 : 0) :
+              name === "洗衣機" ? (appliances.washer ? 1 : 0) :
+              name === "瓦斯爐" ? (appliances.gasStove ? 1 : 0) :
+              0,
+            model: "",
+          })),
+          furniture: CONDITION_FURNITURE_ITEMS.map((name) => ({
+            name,
+            quantity: 0,
+          })),
+        },
+      },
+      photoAttachments: {
+        required: REQUIRED_PHOTO_ITEMS.map((label, photoIndex) => ({
+          label,
+          count: index === 0 && photoIndex < 3 ? 1 : 0,
+        })),
+        optional: OPTIONAL_PHOTO_ITEMS.map((label) => ({
+          label,
+          count: hasLeakIssue && label.startsWith("漏水處") ? 1 : 0,
+        })),
+      },
+      note: "",
+    },
+  };
+});
