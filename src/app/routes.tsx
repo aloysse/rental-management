@@ -8,6 +8,7 @@ import { PropertyList } from "./pages/properties/PropertyList";
 import { PropertyDetail } from "./pages/properties/PropertyDetail";
 import { ActiveRentalList } from "./pages/active-rentals/ActiveRentalList";
 import { ActiveRentalDetail } from "./pages/active-rentals/ActiveRentalDetail";
+import { OperatorProfile } from "./pages/operator-profile/OperatorProfile";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: "properties/:id", Component: PropertyDetail },
       { path: "active-rentals", Component: ActiveRentalList },
       { path: "active-rentals/:id", Component: ActiveRentalDetail },
+      { path: "operator-profile", Component: OperatorProfile },
     ],
   },
 ], {
