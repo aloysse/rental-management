@@ -185,7 +185,7 @@ function Attachment4TableSection({
   );
 }
 
-function SchemaDelegationContractEditDialog({
+function SchemaContractEditDialog({
   schema,
   contractType,
   property,
@@ -476,7 +476,7 @@ export function DelegationContractEditDialog({
 
   if (schema) {
     return (
-      <SchemaDelegationContractEditDialog
+      <SchemaContractEditDialog
         schema={schema}
         contractType={contractType}
         property={property}
@@ -492,12 +492,31 @@ export function DelegationContractEditDialog({
 /* ── 租賃契約編輯 Dialog（ActiveRentalDetail 用）── */
 export function RentalContractEditDialog({
   contractType,
+  contractTypeId,
+  property,
+  landlord,
   onClose,
 }: {
   contractType: string;
+  contractTypeId?: string;
+  property?: any;
+  landlord?: any;
   onClose: () => void;
 }) {
   const { isUpgrade } = useVersion();
+  const schema = getDelegationContractFormSchema(contractTypeId);
+  if (schema) {
+    return (
+      <SchemaContractEditDialog
+        schema={schema}
+        contractType={contractType}
+        property={property}
+        landlord={landlord}
+        onClose={onClose}
+      />
+    );
+  }
+
   const [step, setStep] = useState(0);
   const STEPS = ["基本資訊", "租賃條款", "特約事項", "確認簽署"];
   const isLastStep = step === STEPS.length - 1;

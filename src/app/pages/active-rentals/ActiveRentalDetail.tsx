@@ -116,7 +116,10 @@ export function ActiveRentalDetail() {
       )}
       {editingContract && (
         <RentalContractEditDialog
+          contractTypeId={editingContract.typeId}
           contractType={editingContract.label}
+          property={property}
+          landlord={landlord}
           onClose={() => setEditingContract(null)}
         />
       )}
