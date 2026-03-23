@@ -32,6 +32,7 @@ export function StopRentalModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div>
             <h2 className="text-gray-800">{step === 1 ? "停止租賃" : "確認停止租賃"}</h2>
+            <p className="text-xs text-gray-400 mt-1">流程：填寫資訊 → 最終確認</p>
             <div className="flex items-center gap-2 mt-1">
               {[1, 2].map((s) => (
                 <div key={s} className="flex items-center gap-1">

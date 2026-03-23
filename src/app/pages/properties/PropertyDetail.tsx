@@ -414,14 +414,6 @@ export function PropertyDetail() {
 
           <div className="space-y-5">
             <div className="bg-white border border-gray-200 rounded-lg p-5">
-              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">狀態設定</h2>
-              <div className="space-y-3">
-                {isUpgrade && (
-                  <FormField label="社宅申請狀態" placeholder={property?.applied ? "通過" : "未通過"} type="select" />
-                )}
-              </div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-5">
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">備註</h2>
               <FormField label="" placeholder="請輸入備註說明..." type="textarea" />
             </div>
