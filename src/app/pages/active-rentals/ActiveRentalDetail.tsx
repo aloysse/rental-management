@@ -280,7 +280,12 @@ export function ActiveRentalDetail() {
               }`}
             >
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">合約操作</h2>
-              {leaseStatus === "進行中" && (
+              {isNew && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                  此為新建立的租賃案件，請先建立合約。
+                </div>
+              )}
+              {leaseStatus === "進行中" && !isNew && (
                 <div className="flex items-start gap-4 p-4 border border-red-200 rounded-lg">
                   <div className="flex-1">
                     <p className="text-sm text-gray-800 font-medium">停止合約</p>
@@ -322,9 +327,9 @@ export function ActiveRentalDetail() {
                   </div>
                 </div>
               )}
-              {leaseStatus === "已結束" && (
+              {leaseStatus === "已結束" &&  (
                 <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400">
-                  此案件已結束，無可執行的合約操作。
+                  合約已結束，無可執行的合約操作。
                 </div>
               )}
             </div>

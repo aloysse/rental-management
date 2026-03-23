@@ -101,7 +101,7 @@ const baseProperties = [
     id: "P001", caseNo: "住通台北B2T00001", name: "中正一號",
     address: "台北市中正區忠孝東路1段1號3樓", district: "台北市中正區",
     size: 25.5, rent: 18000, status: "出租中", landlordId: "L001", landlordName: "台灣房產有限公司",
-    applied: true, floor: 3, type: "套房",
+    applied: "已通過", floor: 3, type: "套房",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "台北市", district: "中正區", street: "忠孝東路1段", lane: "", alley: "", number: "1號", subNumber: "", hideDoorplate: false },
@@ -145,7 +145,7 @@ const baseProperties = [
     id: "P002", caseNo: "住通台北B2T00002", name: "中正二號",
     address: "台北市中正區忠孝東路1段3號5樓", district: "台北市中正區",
     size: 32.0, rent: 22000, status: "待出租", landlordId: "L001", landlordName: "台灣房產有限公司",
-    applied: false, floor: 5, type: "一房一廳",
+    applied: "未申請", floor: 5, type: "一房一廳",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "台北市", district: "中正區", street: "忠孝東路1段", lane: "", alley: "", number: "3號", subNumber: "", hideDoorplate: false },
@@ -183,7 +183,7 @@ const baseProperties = [
     id: "P003", caseNo: "住通台北B2T00003", name: "板橋好宅",
     address: "新北市板橋區文化路二段15號2樓", district: "新北市板橋區",
     size: 45.8, rent: 28000, status: "待出租", landlordId: "L002", landlordName: "周建國",
-    applied: true, floor: 2, type: "兩房一廳",
+    applied: "申請中", floor: 2, type: "兩房一廳",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "新北市", district: "板橋區", street: "文化路二段", lane: "", alley: "", number: "15號", subNumber: "", hideDoorplate: false },
@@ -225,7 +225,7 @@ const baseProperties = [
     id: "P004", caseNo: "住通台北B2T00004", name: "大安精品",
     address: "台北市大安區信義路四段88號10樓", district: "台北市大安區",
     size: 58.3, rent: 45000, status: "出租中", landlordId: "L003", landlordName: "大安建設股份有限公司",
-    applied: true, floor: 10, type: "三房兩廳",
+    applied: "已通過", floor: 10, type: "三房兩廳",
     rentalType: "社宅包租案", agentName: "王業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "台北市", district: "大安區", street: "信義路四段", lane: "", alley: "", number: "88號", subNumber: "", hideDoorplate: true },
@@ -270,7 +270,7 @@ const baseProperties = [
     id: "P005", caseNo: "住通台北B2T00005", name: "大安雅居",
     address: "台北市大安區敦化南路二段20號8樓", district: "台北市大安區",
     size: 38.6, rent: 35000, status: "租約到期", landlordId: "L003", landlordName: "大安建設股份有限公司",
-    applied: false, floor: 8, type: "兩房一廳",
+    applied: "未通過", floor: 8, type: "兩房一廳",
     rentalType: "一般租案", agentName: "王業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "台北市", district: "大安區", street: "敦化南路二段", lane: "", alley: "", number: "20號", subNumber: "", hideDoorplate: false },
@@ -308,7 +308,7 @@ const baseProperties = [
     id: "P006", caseNo: "住通台北B2T00006", name: "內湖小築",
     address: "台北市內湖區民權東路六段108號4樓", district: "台北市內湖區",
     size: 28.2, rent: 20000, status: "出租中", landlordId: "L004", landlordName: "吳麗華",
-    applied: true, floor: 4, type: "套房",
+    applied: "已通過", floor: 4, type: "套房",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "台北市", district: "內湖區", street: "民權東路六段", lane: "", alley: "", number: "108號", subNumber: "", hideDoorplate: false },
@@ -350,7 +350,7 @@ const baseProperties = [
     id: "P007", caseNo: "住通台北B2T00007", name: "中正精選",
     address: "台北市中正區重慶南路一段57號6樓", district: "台北市中正區",
     size: 28.0, rent: 20000, status: "待出租", landlordId: "L001", landlordName: "台灣房產有限公司",
-    applied: false, floor: 6, type: "一房一廳",
+    applied: "未申請", floor: 6, type: "一房一廳",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "台北市", district: "中正區", street: "重慶南路一段", lane: "", alley: "", number: "57號", subNumber: "", hideDoorplate: true },
@@ -388,7 +388,7 @@ const baseProperties = [
     id: "P008", caseNo: "住通台北B2T00008", name: "板橋新苑",
     address: "新北市板橋區新站路99號5樓", district: "新北市板橋區",
     size: 40.5, rent: 29000, status: "待出租", landlordId: "L002", landlordName: "周建國",
-    applied: false, floor: 5, type: "兩房一廳",
+    applied: "申請中", floor: 5, type: "兩房一廳",
     rentalType: "一般租案", agentName: "張業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "新北市", district: "板橋區", street: "新站路", lane: "", alley: "", number: "99號", subNumber: "", hideDoorplate: false },
@@ -426,7 +426,7 @@ const baseProperties = [
     id: "P009", caseNo: "住通台北B2T00009", name: "內湖安居",
     address: "台北市內湖區瑞光路258號3樓", district: "台北市內湖區",
     size: 22.3, rent: 18000, status: "待出租", landlordId: "L004", landlordName: "吳麗華",
-    applied: false, floor: 3, type: "套房",
+    applied: "未通過", floor: 3, type: "套房",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "台北市", district: "內湖區", street: "瑞光路", lane: "", alley: "", number: "258號", subNumber: "", hideDoorplate: false },
@@ -464,7 +464,7 @@ const baseProperties = [
     id: "P010", caseNo: "住通台北B2T00010", name: "中壢溫馨宅",
     address: "桃園市中壢區中央西路一段120號4樓", district: "桃園市中壢區",
     size: 20.8, rent: 19000, status: "待出租", landlordId: "L001", landlordName: "台灣房產有限公司",
-    applied: false, floor: 4, type: "套房",
+    applied: "未申請", floor: 4, type: "套房",
     rentalType: "一般租案", agentName: "李業務",
     propertyInfo: createPropertyInfo({
       rentalAddress: { city: "桃園市", district: "中壢區", street: "中央西路一段", lane: "", alley: "", number: "120號", subNumber: "", hideDoorplate: false },

@@ -151,7 +151,7 @@ export function PropertyList() {
                 </td>
                 {isUpgrade && (
                   <td className="px-4 py-3">
-                    <StatusBadge status={property.applied ? "通過" : "未通過"} />
+                    <StatusBadge status={property.applied} />
                   </td>
                 )}
                 <td className="px-4 py-3 text-right">
