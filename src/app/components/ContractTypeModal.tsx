@@ -157,7 +157,7 @@ export function ContractTypeModal({
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
-          {/* 租賃類型（rental 模式） */}
+          {/* 一般版區塊 */}
           {mode === "rental" &&
             BASE_CONTRACT_TYPES.map((type) => (
               <TypeButton
@@ -170,38 +170,6 @@ export function ContractTypeModal({
               />
             ))}
 
-          {mode === "rental" && isUpgrade && (
-            <>
-              <div className="flex items-center gap-2 pt-2 pb-1">
-                <div className="flex-1 h-px bg-amber-200" />
-                <span className="flex items-center gap-1 text-xs text-amber-600 px-1">
-                  <Zap size={11} />升級版專屬
-                </span>
-                <div className="flex-1 h-px bg-amber-200" />
-              </div>
-              {UPGRADE_CONTRACT_TYPES.map((type) => (
-                <TypeButton
-                  key={type.id}
-                  type={type}
-                  selected={selected}
-                  isUsed={existingTypeIds.includes(type.id)}
-                  variant="upgrade"
-                  onSelect={setSelected}
-                />
-              ))}
-            </>
-          )}
-
-          {/* 委託用分隔線（rental 模式才加） */}
-          {mode === "rental" && (
-            <div className="flex items-center gap-2 pt-2 pb-1">
-              <div className="flex-1 h-px bg-blue-200" />
-              <span className="flex items-center gap-1 text-xs text-blue-600 px-1">委託用</span>
-              <div className="flex-1 h-px bg-blue-200" />
-            </div>
-          )}
-
-          {/* 委託類型 */}
           {DELEGATION_TYPES.map((type) => (
             <TypeButton
               key={type.id}
@@ -214,17 +182,27 @@ export function ContractTypeModal({
             />
           ))}
 
+          {/* 升級版區塊 */}
           {isUpgrade && (
             <>
-              {mode === "delegation" && (
-                <div className="flex items-center gap-2 pt-2 pb-1">
-                  <div className="flex-1 h-px bg-amber-200" />
-                  <span className="flex items-center gap-1 text-xs text-amber-600 px-1">
-                    <Zap size={11} />升級版專屬
-                  </span>
-                  <div className="flex-1 h-px bg-amber-200" />
-                </div>
-              )}
+              <div className="flex items-center gap-2 pt-2 pb-1">
+                <div className="flex-1 h-px bg-amber-200" />
+                <span className="flex items-center gap-1 text-xs text-amber-600 px-1">
+                  <Zap size={11} />升級版專屬
+                </span>
+                <div className="flex-1 h-px bg-amber-200" />
+              </div>
+              {mode === "rental" &&
+                UPGRADE_CONTRACT_TYPES.map((type) => (
+                  <TypeButton
+                    key={type.id}
+                    type={type}
+                    selected={selected}
+                    isUsed={existingTypeIds.includes(type.id)}
+                    variant="upgrade"
+                    onSelect={setSelected}
+                  />
+                ))}
               {UPGRADE_DELEGATION_TYPES.map((type) => (
                 <TypeButton
                   key={type.id}

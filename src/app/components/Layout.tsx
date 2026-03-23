@@ -11,9 +11,9 @@ import {
 } from "./ui/dropdown-menu";
 
 const navItems = [
-  { label: "委託出租物件", icon: Home, path: "/properties" },
   { label: "出租人", icon: Building2, path: "/landlords" },
   { label: "承租人", icon: Users, path: "/tenants" },
+  { label: "委託出租物件", icon: Home, path: "/properties" },
   { label: "出租中物件", icon: Key, path: "/active-rentals" },
 ];
 

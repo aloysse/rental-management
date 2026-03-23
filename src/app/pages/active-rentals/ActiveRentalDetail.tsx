@@ -7,13 +7,20 @@ import {
 import { useVersion } from "../../context/VersionContext";
 import { activeRentals, properties, landlords, tenants } from "../../data/mockData";
 import {
-  FormField, UpgradeSection, StatusBadge,
+  FormField, StatusBadge,
   RadioGroup, FileAttachmentList, FileUploadButton,
 } from "../../components/WireframeTag";
 import { StepNavBar } from "../../components/StepNavBar";
 import { StepTabBar } from "../../components/StepTabBar";
 import { ContractTypeModal } from "../../components/ContractTypeModal";
 import { RentalContractEditDialog } from "../../components/ContractEditDialog";
+import {
+  PropertyRentalTypeCard,
+  PropertyBasicInfoCard,
+  PropertyAgentCard,
+  LandlordInfoCard,
+  PropertyConditionSection,
+} from "../../components/PropertySharedSections";
 import { getLeaseStatus, getDaysUntilExpiry } from "./leaseUtils";
 import { StopRentalModal } from "./StopRentalModal";
 import { LeaseTerminationModal } from "./LeaseTerminationModal";
@@ -185,42 +192,12 @@ export function ActiveRentalDetail() {
       {activeTab === "propertyInfo" && (
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-2 space-y-5">
-            <div className="bg-white border border-gray-200 rounded-lg p-5">
-              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">租案類型</h2>
-              <div className="flex gap-6">
-                <label className="inline-flex items-center gap-1.5 text-sm text-gray-700">
-                  <input type="radio" name="rentalType" className="w-4 h-4" defaultChecked={rental?.rentalType === "一般租案"} readOnly />
-                  一般租案
-                </label>
-                {isUpgrade && (
-                  <>
-                    <label className="inline-flex items-center gap-1.5 text-sm text-gray-700">
-                      <input type="radio" name="rentalType" className="w-4 h-4" defaultChecked={rental?.rentalType === "社宅包租案"} readOnly />
-                      社宅包租案
-                    </label>
-                    <label className="inline-flex items-center gap-1.5 text-sm text-gray-700">
-                      <input type="radio" name="rentalType" className="w-4 h-4" defaultChecked={rental?.rentalType === "社宅代租案"} readOnly />
-                      社宅代租案
-                    </label>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-5">
-              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">建物基本資訊</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <FormField label="物件名稱" placeholder={property?.name} />
-                </div>
-                <div className="col-span-2">
-                  <FormField label="地址" placeholder={property?.address} />
-                </div>
-                <FormField label="房型" placeholder={property?.type} type="select" />
-                <FormField label="樓層" placeholder={property?.floor ? `${property.floor}樓` : ""} />
-                <FormField label="坪數（建坪）" placeholder={property?.size ? `${property.size}` : ""} />
-                <FormField label="坪數（實坪）" placeholder="" />
-              </div>
-            </div>
+            <PropertyRentalTypeCard
+              rentalType={rental?.rentalType}
+              isUpgrade={isUpgrade}
+              defaultGeneralChecked={!rental}
+            />
+            <PropertyBasicInfoCard property={property} />
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">租賃內容</h2>
               <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 mb-5">
@@ -235,10 +212,7 @@ export function ActiveRentalDetail() {
                 <FormField label="押金（月）" placeholder={rental?.depositMonths ? `${rental.depositMonths}` : ""} />
               </div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-5">
-              <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">負責營業員</h2>
-              <FormField label="營業員" placeholder={rental?.agentName} type="select" />
-            </div>
+            <PropertyAgentCard agentName={rental?.agentName} />
           </div>
           <div className="space-y-5">
             <div className="bg-white border border-gray-200 rounded-lg p-5">
@@ -261,80 +235,17 @@ export function ActiveRentalDetail() {
       {/* ── Tab: 出租人資訊 ── */}
       {activeTab === "landlordInfo" && (
         <div className="max-w-2xl">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
-              <h2 className="text-sm text-gray-700">出租人資訊</h2>
-              <StatusBadge status={landlord?.type ?? "自然人"} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <FormField label="姓名／名稱" placeholder={landlord?.name} />
-              </div>
-              <FormField label="聯絡電話" placeholder={landlord?.phone} />
-              <div className="col-span-2">
-                <FormField label="Email" placeholder={landlord?.email} />
-              </div>
-              <FormField label="銀行名稱" placeholder={landlord?.bank} />
-              <FormField label="帳號" placeholder={landlord?.account} />
-            </div>
+          <div className="flex items-center gap-2 mb-3">
+            <StatusBadge status={landlord?.type ?? "自然人"} />
+            <span className="text-sm text-gray-700">{landlord?.name ?? "未指定出租人"}</span>
           </div>
+          <LandlordInfoCard landlord={landlord} />
         </div>
       )}
 
       {/* ── Tab: 屋況 ── */}
       {activeTab === "condition" && (
-        <div className="max-w-2xl space-y-5">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">設備條件</h2>
-            <div className="space-y-5">
-              <div>
-                <label className="text-xs text-gray-500">車位</label>
-                <RadioGroup
-                  name="parking"
-                  options={["無", "有"]}
-                  defaultValue={property?.houseCondition?.parking ? "有" : "無"}
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 block mb-2">家電設備</label>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { key: "ac", label: "冷氣" }, { key: "waterHeater", label: "熱水器" },
-                    { key: "fridge", label: "冰箱" }, { key: "washer", label: "洗衣機" },
-                    { key: "gasStove", label: "瓦斯爐" }, { key: "inductionCooker", label: "電磁爐" },
-                    { key: "internet", label: "網路" }, { key: "cableTV", label: "第四台" },
-                  ].map((item) => {
-                    const checked = property?.houseCondition?.appliances?.[item.key as keyof typeof property.houseCondition.appliances];
-                    return (
-                      <label key={item.key} className="flex items-center gap-1.5 text-xs text-gray-600 border border-gray-200 rounded px-2 py-1 bg-white">
-                        <input type="checkbox" className="w-3 h-3" defaultChecked={!!checked} readOnly />
-                        {item.label}
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-          {isUpgrade && (
-            <UpgradeSection label="社宅安全檢測">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs text-gray-500">是否為海砂屋</label>
-                  <RadioGroup name="seaSand" options={["否", "是"]} defaultValue={property?.houseCondition?.socialCheck?.seaSand ? "是" : "否"} />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">是否為輻射屋</label>
-                  <RadioGroup name="radiation" options={["否", "是"]} defaultValue={property?.houseCondition?.socialCheck?.radiation ? "是" : "否"} />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">有無定期消防安全檢查</label>
-                  <RadioGroup name="fireInspection" options={["無", "有"]} defaultValue={property?.houseCondition?.socialCheck?.fireInspection ? "有" : "無"} />
-                </div>
-              </div>
-            </UpgradeSection>
-          )}
-        </div>
+        <PropertyConditionSection property={property} />
       )}
 
       {/* ── Tab: 承租人資訊 ── */}
