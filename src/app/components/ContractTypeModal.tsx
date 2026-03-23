@@ -15,6 +15,13 @@ interface ContractTypeModalProps {
   onSelect: (typeId: string, label: string) => void;
 }
 
+const UPGRADE_CONTRACT_PERIODS = [
+  "第五期 1141010",
+  "第四期 1141001",
+  "第四期 1140201",
+  "第三期 1131210",
+] as const;
+
 function TypeButton({
   type,
   selected,
@@ -122,6 +129,8 @@ export function ContractTypeModal({
 }: ContractTypeModalProps) {
   const { isUpgrade } = useVersion();
   const [selected, setSelected] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const [step, setStep] = useState<"type" | "period">("type");
 
   const allTypes = [
     ...(mode === "rental" ? BASE_CONTRACT_TYPES : []),
@@ -130,6 +139,11 @@ export function ContractTypeModal({
     ...(isUpgrade ? UPGRADE_DELEGATION_TYPES : []),
   ];
   const selectedLabel = allTypes.find((t) => t.id === selected)?.label ?? "";
+  const upgradeTypeIds = new Set([
+    ...UPGRADE_CONTRACT_TYPES.map((t) => t.id),
+    ...UPGRADE_DELEGATION_TYPES.map((t) => t.id),
+  ]);
+  const isSelectedUpgradeType = selected ? upgradeTypeIds.has(selected) : false;
 
   const delegationBadge = (
     <span className="text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded px-1.5 py-0.5">
@@ -137,16 +151,51 @@ export function ContractTypeModal({
     </span>
   );
 
+  const handleTypeSelect = (id: string) => {
+    setSelected(id);
+    setSelectedPeriod(null);
+    setStep("type");
+  };
+
+  const handlePrimaryAction = () => {
+    if (!selected) {
+      return;
+    }
+
+    if (step === "type" && isSelectedUpgradeType) {
+      setStep("period");
+      return;
+    }
+
+    const finalLabel = selectedPeriod
+      ? `${selectedLabel}（${selectedPeriod}）`
+      : selectedLabel;
+    onSelect(selected, finalLabel);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-2xl w-[520px] max-h-[70vh] flex flex-col overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div>
-            <h2 className="text-gray-800">
-              {mode === "delegation" ? "選擇委託契約類型" : "選擇合約類型"}
-            </h2>
-            <p className="text-xs text-gray-400 mt-0.5">已使用的類別將標記說明</p>
+            {step === "period" ? (
+              <>
+                <h2 className="text-gray-800">選擇契約期數</h2>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  已選擇：{selectedLabel}
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-gray-800">
+                  {mode === "delegation" ? "選擇委託契約類型" : "選擇合約類型"}
+                </h2>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  已使用的類別將標記說明
+                </p>
+              </>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -156,69 +205,111 @@ export function ContractTypeModal({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
-          {/* 一般版區塊 */}
-          {mode === "rental" &&
-            BASE_CONTRACT_TYPES.map((type) => (
+        {step === "period" ? (
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+            {UPGRADE_CONTRACT_PERIODS.map((period) => {
+              const isSelectedPeriod = selectedPeriod === period;
+              return (
+                <button
+                  key={period}
+                  onClick={() => setSelectedPeriod(period)}
+                  className={`w-full flex items-center justify-between gap-3 p-3.5 rounded-lg border text-left transition-all ${
+                    isSelectedPeriod
+                      ? "border-amber-500 bg-amber-50 ring-1 ring-amber-400"
+                      : "border-amber-200 bg-amber-50/40 hover:border-amber-300 hover:bg-amber-50"
+                  }`}
+                >
+                  <p className="text-sm text-gray-700">{period}</p>
+                  <div
+                    className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+                      isSelectedPeriod
+                        ? "border-amber-500 bg-amber-500"
+                        : "border-amber-300"
+                    }`}
+                  >
+                    {isSelectedPeriod && (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+            {/* 一般版區塊 */}
+            {mode === "rental" &&
+              BASE_CONTRACT_TYPES.map((type) => (
+                <TypeButton
+                  key={type.id}
+                  type={type}
+                  selected={selected}
+                  isUsed={existingTypeIds.includes(type.id)}
+                  variant="default"
+                  onSelect={handleTypeSelect}
+                />
+              ))}
+
+            {DELEGATION_TYPES.map((type) => (
               <TypeButton
                 key={type.id}
                 type={type}
                 selected={selected}
                 isUsed={existingTypeIds.includes(type.id)}
                 variant="default"
-                onSelect={setSelected}
+                onSelect={handleTypeSelect}
+                badge={mode === "rental" ? delegationBadge : undefined}
               />
             ))}
 
-          {DELEGATION_TYPES.map((type) => (
-            <TypeButton
-              key={type.id}
-              type={type}
-              selected={selected}
-              isUsed={existingTypeIds.includes(type.id)}
-              variant="default"
-              onSelect={setSelected}
-              badge={mode === "rental" ? delegationBadge : undefined}
-            />
-          ))}
-
-          {/* 升級版區塊 */}
-          {isUpgrade && (
-            <>
-              <div className="flex items-center gap-2 pt-2 pb-1">
-                <div className="flex-1 h-px bg-amber-200" />
-                <span className="flex items-center gap-1 text-xs text-amber-600 px-1">
-                  <Zap size={11} />升級版專屬
-                </span>
-                <div className="flex-1 h-px bg-amber-200" />
-              </div>
-              {mode === "rental" &&
-                UPGRADE_CONTRACT_TYPES.map((type) => (
+            {/* 升級版區塊 */}
+            {isUpgrade && (
+              <>
+                <div className="flex items-center gap-2 pt-2 pb-1">
+                  <div className="flex-1 h-px bg-amber-200" />
+                  <span className="flex items-center gap-1 text-xs text-amber-600 px-1">
+                    <Zap size={11} />升級版專屬
+                  </span>
+                  <div className="flex-1 h-px bg-amber-200" />
+                </div>
+                {mode === "rental" &&
+                  UPGRADE_CONTRACT_TYPES.map((type) => (
+                    <TypeButton
+                      key={type.id}
+                      type={type}
+                      selected={selected}
+                      isUsed={existingTypeIds.includes(type.id)}
+                      variant="upgrade"
+                      onSelect={handleTypeSelect}
+                    />
+                  ))}
+                {UPGRADE_DELEGATION_TYPES.map((type) => (
                   <TypeButton
                     key={type.id}
                     type={type}
                     selected={selected}
                     isUsed={existingTypeIds.includes(type.id)}
                     variant="upgrade"
-                    onSelect={setSelected}
+                    onSelect={handleTypeSelect}
+                    badge={mode === "rental" ? delegationBadge : undefined}
                   />
                 ))}
-              {UPGRADE_DELEGATION_TYPES.map((type) => (
-                <TypeButton
-                  key={type.id}
-                  type={type}
-                  selected={selected}
-                  isUsed={existingTypeIds.includes(type.id)}
-                  variant="upgrade"
-                  onSelect={setSelected}
-                  badge={mode === "rental" ? delegationBadge : undefined}
-                />
-              ))}
-            </>
-          )}
-        </div>
+              </>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+          {step === "period" && (
+            <button
+              onClick={() => setStep("type")}
+              className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-100"
+            >
+              上一步
+            </button>
+          )}
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-100"
@@ -226,11 +317,11 @@ export function ContractTypeModal({
             取消
           </button>
           <button
-            disabled={!selected}
-            onClick={() => selected && onSelect(selected, selectedLabel)}
+            disabled={!selected || (step === "period" && !selectedPeriod)}
+            onClick={handlePrimaryAction}
             className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {mode === "delegation" ? "建立契約" : "下一步"}
+            {step === "period" ? "建立契約" : "下一步"}
           </button>
         </div>
       </div>

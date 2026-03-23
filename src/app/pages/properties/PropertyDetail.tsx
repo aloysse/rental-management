@@ -303,7 +303,7 @@ export function PropertyDetail() {
   const [socialConditionChecks, setSocialConditionChecks] = useState<Record<string, boolean>>(
     () =>
       SOCIAL_APPLICATION_CONDITIONS.reduce<Record<string, boolean>>((acc, item) => {
-        acc[item.id] = item.id === "ownerQualified" || item.id === "withinCity" ? !!property?.applied : false;
+        acc[item.id] = item.id === "ownerQualified" || item.id === "withinCity" ? property?.applied !== "未申請" : false;
         return acc;
       }, {})
   );
@@ -334,7 +334,10 @@ export function PropertyDetail() {
       )}
       {editingContract && (
         <DelegationContractEditDialog
+          contractTypeId={editingContract.typeId}
           contractType={editingContract.label}
+          property={property}
+          landlord={linkedLandlord}
           onClose={() => setEditingContract(null)}
         />
       )}
@@ -366,7 +369,7 @@ export function PropertyDetail() {
             {!isNew && property && (
               <div className="flex items-center gap-2 mt-0.5">
                 <StatusBadge status={property.status} />
-                {isUpgrade && <StatusBadge status={property.applied ? "通過" : "未通過"} />}
+                {isUpgrade && <StatusBadge status={property.applied} />}
               </div>
             )}
           </div>
@@ -601,7 +604,7 @@ export function PropertyDetail() {
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">社宅申請資料</h2>
               <div className="space-y-4">
-                <FormField label="申請狀態" placeholder={property?.applied ? "已申請" : "未申請"} type="select" />
+                <FormField label="申請狀態" placeholder={property?.applied || "未申請"} type="select" />
                 <FormField label="出租人編號" placeholder={property?.socialHousingApp?.landlordCode || "請輸入出租人編號"} />
                 <FormField label="虛擬碼" placeholder={property?.socialHousingApp?.virtualCode || "請輸入虛擬碼"} />
               </div>
