@@ -112,9 +112,8 @@ function PhotoUploadCard({ title, count = 0 }: { title: string; count?: number }
   );
 }
 
-export function PropertyRentalTypeCard({ rentalType, isUpgrade, defaultGeneralChecked = false }: {
+export function PropertyRentalTypeCard({ rentalType, defaultGeneralChecked = false }: {
   rentalType?: string;
-  isUpgrade: boolean;
   defaultGeneralChecked?: boolean;
 }) {
   return (
@@ -131,18 +130,14 @@ export function PropertyRentalTypeCard({ rentalType, isUpgrade, defaultGeneralCh
           />
           一般租案
         </label>
-        {isUpgrade && (
-          <>
-            <label className="inline-flex items-center gap-1.5 text-sm text-gray-700">
-              <input type="radio" name="rentalType" className="w-4 h-4" defaultChecked={rentalType === "社宅包租案"} readOnly />
-              社宅包租案
-            </label>
-            <label className="inline-flex items-center gap-1.5 text-sm text-gray-700">
-              <input type="radio" name="rentalType" className="w-4 h-4" defaultChecked={rentalType === "社宅代租案"} readOnly />
-              社宅代租案
-            </label>
-          </>
-        )}
+        <label className="inline-flex items-center gap-1.5 text-sm text-gray-700">
+          <input type="radio" name="rentalType" className="w-4 h-4" defaultChecked={rentalType === "社宅包租案"} readOnly />
+          社宅包租案
+        </label>
+        <label className="inline-flex items-center gap-1.5 text-sm text-gray-700">
+          <input type="radio" name="rentalType" className="w-4 h-4" defaultChecked={rentalType === "社宅代租案"} readOnly />
+          社宅代租案
+        </label>
       </div>
     </div>
   );

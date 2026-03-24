@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, Download, Save, Trash2, Plus, X } from "lucide-react";
-import { useVersion } from "../../context/VersionContext";
 import { tenants, coResidents, properties, activeRentals } from "../../data/mockData";
 import { getLeaseStatus } from "../active-rentals/leaseUtils";
-import { FormField, UpgradeSection, ImageUploadBox, StatusBadge, FileAttachmentList, FileUploadButton } from "../../components/WireframeTag";
+import { FormField, UpgradeSection, ImageUploadBox, StatusBadge, FileAttachmentList, FileUploadButton, BrandButton, BrandCard } from "../../components/WireframeTag";
 
 type TabId = "info" | "socialApp" | "attachments" | "matching";
 
@@ -56,7 +55,7 @@ function ConvertToRentalAlert({ property, onClose, onConfirm }: {
         </p>
         <div className="flex justify-end gap-3">
           <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 rounded text-gray-600 hover:bg-gray-100">取消</button>
-          <button onClick={onConfirm} className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700">確認轉出租</button>
+          <BrandButton onClick={onConfirm}>確認轉出租</BrandButton>
         </div>
       </div>
     </div>
@@ -67,7 +66,6 @@ function ConvertToRentalAlert({ property, onClose, onConfirm }: {
 export function TenantDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isUpgrade } = useVersion();
   const isNew = id === "new";
   const tenant = isNew ? null : tenants.find((t) => t.id === id) ?? tenants[0];
 
@@ -98,7 +96,7 @@ export function TenantDetail() {
 
   const tabs = [
     { id: "info" as TabId, label: "承租人資訊" },
-    ...(isUpgrade ? [{ id: "socialApp" as TabId, label: "社宅申請" }] : []),
+    { id: "socialApp" as TabId, label: "社宅申請" },
     { id: "attachments" as TabId, label: "附加檔案" },
     { id: "matching" as TabId, label: "配對案件" },
   ];
@@ -133,7 +131,7 @@ export function TenantDetail() {
             {!isNew && (
               <div className="flex items-center gap-2 mt-0.5">
                 {tenant?.rentalStatus && <StatusBadge status={tenant.rentalStatus} />}
-                {isUpgrade && <p className="text-xs text-gray-400">編號：{tenant?.id}</p>}
+                <p className="text-xs text-gray-400">編號：{tenant?.id}</p>
               </div>
             )}
           </div>
@@ -144,9 +142,7 @@ export function TenantDetail() {
               <Trash2 size={14} />刪除
             </button>
           )}
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
-            <Save size={14} />{isNew ? "建立" : "儲存"}
-          </button>
+          <BrandButton icon={<Save size={14} />}>{isNew ? "建立" : "儲存"}</BrandButton>
         </div>
       </div>
 
@@ -158,7 +154,7 @@ export function TenantDetail() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-5 py-2.5 text-sm border-b-2 transition-colors ${
               activeTab === tab.id
-                ? "border-gray-800 text-gray-800 font-medium"
+                ? "border-brand text-brand font-medium"
                 : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -190,8 +186,7 @@ export function TenantDetail() {
               </div>
             </div>
 
-            {isUpgrade && (
-              <UpgradeSection label="共住者資訊">
+            <UpgradeSection label="共住者資訊">
                 <div className="space-y-3">
                   {coResidents.map((r, i) => (
                     <div key={i} className="grid grid-cols-3 gap-3 p-3 bg-white border border-gray-200 rounded">
@@ -205,7 +200,6 @@ export function TenantDetail() {
                   </button>
                 </div>
               </UpgradeSection>
-            )}
 
             {/* 承租期望條件 */}
             <div className="bg-white border border-gray-200 rounded-lg p-5">
@@ -263,35 +257,31 @@ export function TenantDetail() {
               <FormField label="" placeholder="請輸入備註說明..." type="textarea" />
             </div>
 
-            {isUpgrade && (
-              <UpgradeSection label="身份資料">
-                <div className="grid grid-cols-1 gap-4">
-                  <FormField label="身份類別" placeholder={tenant?.category || "請選擇"} type="select" />
-                  <FormField label="申請狀態" placeholder={tenant?.applied ? "通過" : "未通過"} type="select" />
-                </div>
-              </UpgradeSection>
-            )}
+            <UpgradeSection label="身份資料">
+              <div className="grid grid-cols-1 gap-4">
+                <FormField label="身份類別" placeholder={tenant?.category || "請選擇"} type="select" />
+                <FormField label="申請狀態" placeholder={tenant?.applied ? "通過" : "未通過"} type="select" />
+              </div>
+            </UpgradeSection>
 
-            {isUpgrade && (
-              <UpgradeSection label="證件上傳">
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-2">身分證正面</p>
-                    <ImageUploadBox label="上傳身分證正面" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-2">身分證反面</p>
-                    <ImageUploadBox label="上傳身分證反面" />
-                  </div>
+            <UpgradeSection label="證件上傳">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500 mb-2">身分證正面</p>
+                  <ImageUploadBox label="上傳身分證正面" />
                 </div>
-              </UpgradeSection>
-            )}
+                <div>
+                  <p className="text-xs text-gray-500 mb-2">身分證反面</p>
+                  <ImageUploadBox label="上傳身分證反面" />
+                </div>
+              </div>
+            </UpgradeSection>
           </div>
         </div>
       )}
 
-      {/* ── Tab: 社宅申請（升級版）── */}
-      {activeTab === "socialApp" && isUpgrade && (
+      {/* ── Tab: 社宅申請 ── */}
+      {activeTab === "socialApp" && (
         <div className="max-w-2xl space-y-5">
           <div className="bg-white border border-gray-200 rounded-lg p-5">
             <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">社宅申請資料</h2>
@@ -420,7 +410,7 @@ export function TenantDetail() {
                         </button>
                         <button
                           onClick={() => setConvertingProperty(p)}
-                          className="text-xs text-gray-800 px-2 py-1 border border-gray-800 rounded hover:bg-gray-50"
+                          className="text-xs text-brand px-2 py-1 border border-brand rounded hover:bg-brand-light"
                         >
                           配對轉出租
                         </button>

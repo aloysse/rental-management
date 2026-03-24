@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Save } from "lucide-react";
+import { BrandButton, BrandCard } from "../../components/WireframeTag";
 
 const applicationPeriods = [
   "第五期 1141010",
@@ -48,14 +49,11 @@ export function OperatorProfile() {
           <h1 className="text-gray-800 text-lg">業者資料</h1>
           <p className="text-xs text-gray-400 mt-0.5">業者基本資料與社宅申請設定</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
-          <Save size={14} />
-          儲存
-        </button>
+        <BrandButton icon={<Save size={14} />}>儲存</BrandButton>
       </div>
 
       <div className="max-w-4xl space-y-5">
-        <div className="bg-white border border-gray-200 rounded-lg p-5">
+        <BrandCard className="p-5">
           <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">公司基本資料</h2>
           <div className="space-y-6">
             <div>
@@ -82,9 +80,10 @@ export function OperatorProfile() {
               </div>
             </div>
           </div>
+          </BrandCard>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-5">
+        <BrandCard className="p-5">
           <h2 className="text-sm text-gray-700 mb-3 pb-2 border-b border-gray-100">社會住宅申請期數</h2>
           <p className="text-xs text-gray-500 mb-4">可複選多個期數</p>
           <div className="grid grid-cols-2 gap-3">
@@ -95,7 +94,7 @@ export function OperatorProfile() {
                   key={period}
                   className={`flex items-center gap-2 px-3 py-2 border rounded text-sm cursor-pointer transition-colors ${
                     checked
-                      ? "border-gray-800 bg-gray-50 text-gray-800"
+                      ? "border-brand bg-brand-light text-brand"
                       : "border-gray-300 text-gray-600 hover:bg-gray-50"
                   }`}
                 >
@@ -110,8 +109,7 @@ export function OperatorProfile() {
               );
             })}
           </div>
-        </div>
+        </BrandCard>
       </div>
-    </div>
   );
 }

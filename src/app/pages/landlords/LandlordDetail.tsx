@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, Save, Trash2, ExternalLink } from "lucide-react";
-import { useVersion } from "../../context/VersionContext";
 import { landlords, properties } from "../../data/mockData";
-import { FormField, UpgradeSection, ImageUploadBox, StatusBadge } from "../../components/WireframeTag";
+import { FormField, UpgradeSection, ImageUploadBox, StatusBadge, BrandButton, BrandCard } from "../../components/WireframeTag";
 
 type LandlordKind = "出租人" | "法人";
 
 export function LandlordDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isUpgrade } = useVersion();
   const isNew = id === "new";
   const landlord = isNew ? null : landlords.find((l) => l.id === id) ?? landlords[0];
   const ownedProperties = landlord
@@ -47,10 +45,7 @@ export function LandlordDetail() {
               刪除
             </button>
           )}
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
-            <Save size={14} />
-            {isNew ? "建立" : "儲存"}
-          </button>
+          <BrandButton icon={<Save size={14} />}>{isNew ? "建立" : "儲存"}</BrandButton>
         </div>
       </div>
 
@@ -64,7 +59,7 @@ export function LandlordDetail() {
               onClick={() => setLandlordKind(kind)}
               className={`px-4 py-1.5 transition-colors ${
                 landlordKind === kind
-                  ? "bg-gray-800 text-white"
+                  ? "bg-brand text-white"
                   : "bg-white text-gray-500 hover:bg-gray-50"
               }`}
             >
@@ -78,7 +73,7 @@ export function LandlordDetail() {
         {/* Left */}
         <div className="col-span-2 space-y-5">
           {/* Basic */}
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
+          <BrandCard className="p-5">
             <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">基本資料</h2>
 
             {landlordKind === "出租人" ? (
@@ -120,10 +115,10 @@ export function LandlordDetail() {
                 </div>
               </div>
             )}
-          </div>
+          </BrandCard>
 
           {/* Bank Info */}
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
+          <BrandCard className="p-5">
             <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">銀行帳戶資料</h2>
             <div className="grid grid-cols-2 gap-4">
               <FormField label="銀行名稱" placeholder={landlord?.bank || "請選擇銀行"} type="select" />
@@ -133,11 +128,11 @@ export function LandlordDetail() {
               </div>
               <FormField label="戶名" placeholder="請輸入戶名" />
             </div>
-          </div>
+          </BrandCard>
 
           {/* Properties */}
           {!isNew && (
-            <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <BrandCard className="p-5">
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
                 <h2 className="text-sm text-gray-700">名下物件</h2>
                 <span className="text-xs text-gray-400">{ownedProperties.length} 件</span>
@@ -160,39 +155,37 @@ export function LandlordDetail() {
                   </div>
                 ))}
               </div>
-            </div>
+            </BrandCard>
           )}
         </div>
 
         {/* Right */}
         <div className="space-y-5">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
+          <BrandCard className="p-5">
             <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">備註</h2>
             <FormField label="" placeholder="請輸入備註說明..." type="textarea" />
-          </div>
+          </BrandCard>
 
-          {isUpgrade && (
-            <UpgradeSection label="證件上傳">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs text-gray-500 mb-2">
-                    {landlordKind === "出租人" ? "身分證正面" : "公司登記證明正面"}
-                  </p>
-                  <ImageUploadBox label="上傳正面" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-2">
-                    {landlordKind === "出租人" ? "身分證反面" : "公司登記證明反面"}
-                  </p>
-                  <ImageUploadBox label="上傳反面" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-2">存摺封面</p>
-                  <ImageUploadBox label="上傳存摺封面" />
-                </div>
+          <UpgradeSection label="證件上傳">
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-gray-500 mb-2">
+                  {landlordKind === "出租人" ? "身分證正面" : "公司登記證明正面"}
+                </p>
+                <ImageUploadBox label="上傳正面" />
               </div>
-            </UpgradeSection>
-          )}
+              <div>
+                <p className="text-xs text-gray-500 mb-2">
+                  {landlordKind === "出租人" ? "身分證反面" : "公司登記證明反面"}
+                </p>
+                <ImageUploadBox label="上傳反面" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-2">存摺封面</p>
+                <ImageUploadBox label="上傳存摺封面" />
+              </div>
+            </div>
+          </UpgradeSection>
         </div>
       </div>
     </div>

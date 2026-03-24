@@ -3,11 +3,10 @@ import { useNavigate, useParams } from "react-router";
 import {
   ArrowLeft, Trash2, Download, Plus, X, FileText, ExternalLink, Zap
 } from "lucide-react";
-import { useVersion } from "../../context/VersionContext";
 import { properties, landlords, tenants, activeRentals } from "../../data/mockData";
 import {
   FormField, StatusBadge,
-  FileUploadButton, FileAttachmentList,
+  FileUploadButton, FileAttachmentList, BrandButton, BrandCard,
 } from "../../components/WireframeTag";
 import { StepNavBar } from "../../components/StepNavBar";
 import { StepTabBar } from "../../components/StepTabBar";
@@ -195,7 +194,7 @@ function ConvertToRentalAlert({ tenant, onClose, onConfirm }: {
         </p>
         <div className="flex justify-end gap-3">
           <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 rounded text-gray-600 hover:bg-gray-100">取消</button>
-          <button onClick={onConfirm} className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700">確認轉出租</button>
+          <button onClick={onConfirm} className="px-5 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark">確認轉出租</button>
         </div>
       </div>
     </div>
@@ -246,7 +245,6 @@ function SelectLandlordDialog({ onClose, onSelect }: {
 export function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isUpgrade } = useVersion();
   const isNew = id === "new";
   const property = isNew ? null : properties.find((p) => p.id === id) ?? properties[0];
   const defaultLandlord = property ? landlords.find((l) => l.id === property.landlordId) ?? null : null;
@@ -283,7 +281,7 @@ export function PropertyDetail() {
     { id: "propertyInfo" as TabId, label: "物件資訊" },
     { id: "landlordInfo" as TabId, label: "出租人資訊" },
     { id: "condition" as TabId, label: "屋況設備" },
-    ...(isUpgrade ? [{ id: "socialApp" as TabId, label: "社宅申請" }] : []),
+    { id: "socialApp" as TabId, label: "社宅申請" },
     { id: "contract" as TabId, label: "委託契約" },
     { id: "attachments" as TabId, label: "附加檔案" },
     { id: "matching" as TabId, label: "承租人配對" },
@@ -369,7 +367,7 @@ export function PropertyDetail() {
             {!isNew && property && (
               <div className="flex items-center gap-2 mt-0.5">
                 <StatusBadge status={property.status} />
-                {isUpgrade && <StatusBadge status={property.applied} />}
+                <StatusBadge status={property.applied} />
               </div>
             )}
           </div>
@@ -383,7 +381,7 @@ export function PropertyDetail() {
           {showConvertButton && (
             <button
               onClick={() => navigate("/active-rentals/AR001")}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700"
+              className="flex items-center gap-2 px-4 py-2 bg-brand text-white text-sm rounded hover:bg-brand-dark"
             >
               轉出租中物件
             </button>
@@ -404,7 +402,6 @@ export function PropertyDetail() {
           <div className="col-span-2 space-y-5">
             <PropertyRentalTypeCard
               rentalType={property?.rentalType}
-              isUpgrade={isUpgrade}
               defaultGeneralChecked={!property}
             />
             <PropertyBasicInfoCard property={property} />
@@ -421,7 +418,7 @@ export function PropertyDetail() {
               <FormField label="" placeholder="請輸入備註說明..." type="textarea" />
             </div>
             <PropertyAgentCard agentName={property?.agentName} />
-            <button className="flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm text-white bg-gray-800 hover:bg-gray-600 transition-colors">
+            <button className="flex items-center gap-2 px-5 py-2.5 border border-brand rounded-lg text-sm text-white bg-brand hover:bg-brand-dark transition-colors">
               <ExternalLink size={15} />
               591 一鍵拋轉
             </button>
@@ -441,7 +438,7 @@ export function PropertyDetail() {
               <div className="flex gap-3">
                 <button
                   onClick={() => navigate("/landlords/new")}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700"
+                  className="flex items-center gap-2 px-4 py-2 bg-brand text-white text-sm rounded hover:bg-brand-dark"
                 >
                   <Plus size={14} />新增出租人
                 </button>
@@ -478,8 +475,8 @@ export function PropertyDetail() {
         <PropertyConditionSection property={property} />
       )}
 
-      {/* ── Tab: 社宅申請（升級版） ── */}
-      {activeTab === "socialApp" && isUpgrade && (
+      {/* ── Tab: 社宅申請 ── */}
+      {activeTab === "socialApp" && (
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-2 space-y-5">
             <div className="bg-white border border-gray-200 rounded-lg p-5">
@@ -623,7 +620,7 @@ export function PropertyDetail() {
             <h2 className="text-sm text-gray-700">委託契約清單</h2>
             <button
               onClick={() => setShowContractModal(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 text-white text-sm rounded hover:bg-gray-700"
+              className="flex items-center gap-2 px-3 py-1.5 bg-brand text-white text-sm rounded hover:bg-brand-dark"
             >
               <Plus size={14} />新增委託契約
             </button>
@@ -723,7 +720,7 @@ export function PropertyDetail() {
                         </button>
                         <button
                           onClick={() => setConvertingTenant(t)}
-                          className="text-xs text-gray-800 px-2 py-1 border border-gray-800 rounded hover:bg-gray-50"
+                          className="text-xs text-brand px-2 py-1 border border-brand rounded hover:bg-brand-light"
                         >
                           配對轉出租
                         </button>

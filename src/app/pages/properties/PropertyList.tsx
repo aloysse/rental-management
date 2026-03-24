@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Search, Plus, ChevronRight, Filter } from "lucide-react";
-import { useVersion } from "../../context/VersionContext";
 import { properties } from "../../data/mockData";
-import { StatusBadge, UpgradeTag } from "../../components/WireframeTag";
+import { StatusBadge, UpgradeTag, BrandButton, FilterButton, BrandCard } from "../../components/WireframeTag";
 
 export function PropertyList() {
-  const { isUpgrade } = useVersion();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("全部");
@@ -25,35 +23,28 @@ export function PropertyList() {
           <h1 className="text-gray-800 text-lg">委託出租物件</h1>
           <p className="text-xs text-gray-400 mt-0.5">共 {filtered.length} 筆資料</p>
         </div>
-        <button
-          onClick={() => navigate("/properties/new")}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700 transition-colors"
-        >
-          <Plus size={15} />
+        <BrandButton onClick={() => navigate("/properties/new")} icon={<Plus size={15} />}>
           新增物件
-        </button>
+        </BrandButton>
       </div>
 
       {/* Search & Filter */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+      <BrandCard className="p-4 mb-4">
         <div className="flex gap-3 items-center">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
-              className="w-full border border-gray-300 rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+              className="w-full border border-gray-300 rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-brand-border"
               placeholder="搜尋案名、地址、出租人..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <button
-            className={`flex items-center gap-2 px-3 py-2 border text-sm rounded transition-colors ${showFilter ? "border-gray-800 bg-gray-800 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
-            onClick={() => setShowFilter(!showFilter)}
-          >
+          <FilterButton active={showFilter} onClick={() => setShowFilter(!showFilter)}>
             <Filter size={14} />
             篩選條件
-          </button>
-          <button className="px-4 py-2 border border-gray-300 text-sm text-gray-600 rounded hover:bg-gray-50">搜尋</button>
+          </FilterButton>
+          <BrandButton size="sm">搜尋</BrandButton>
           <button className="px-3 py-2 text-xs text-gray-400 hover:text-gray-600" onClick={() => { setSearch(""); setStatusFilter("全部"); }}>清除</button>
         </div>
 
@@ -63,13 +54,9 @@ export function PropertyList() {
               <label className="text-xs text-gray-500">租案類型</label>
               <div className="flex gap-1.5 flex-wrap">
                 {["全部", "出租中", "待出租"].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setStatusFilter(s)}
-                    className={`px-3 py-1 text-xs rounded border transition-colors ${statusFilter === s ? "border-gray-800 bg-gray-800 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
-                  >
+                  <FilterButton key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
                     {s}
-                  </button>
+                  </FilterButton>
                 ))}
               </div>
             </div>
@@ -103,29 +90,25 @@ export function PropertyList() {
             </div>
           </div>
         )}
-      </div>
+      </BrandCard>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <BrandCard className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              {isUpgrade && (
-                <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
+              <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
                   <span className="flex items-center gap-1">物件編號 <UpgradeTag /></span>
                 </th>
-              )}
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">案名</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">地址</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">坪數</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">租金</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">出租人</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">租案類型</th>
-              {isUpgrade && (
-                <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
+              <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
                   <span className="flex items-center gap-1">申請狀態 <UpgradeTag /></span>
                 </th>
-              )}
               <th className="px-4 py-3 text-right text-xs text-gray-500 font-medium"></th>
             </tr>
           </thead>
@@ -136,9 +119,7 @@ export function PropertyList() {
                 className="hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => navigate(`/properties/${property.id}`)}
               >
-                {isUpgrade && (
-                  <td className="px-4 py-3 text-gray-500 text-xs font-mono">{property.socialHousingApp.landlordCode}</td>
-                )}
+                <td className="px-4 py-3 text-gray-500 text-xs font-mono">{property.socialHousingApp.landlordCode}</td>
                 <td className="px-4 py-3">
                   <span className="text-gray-800">{property.name}</span>
                 </td>
@@ -149,11 +130,9 @@ export function PropertyList() {
                 <td className="px-4 py-3">
                   <StatusBadge status={property.rentalType} />
                 </td>
-                {isUpgrade && (
-                  <td className="px-4 py-3">
-                    <StatusBadge status={property.applied} />
-                  </td>
-                )}
+                <td className="px-4 py-3">
+                  <StatusBadge status={property.applied} />
+                </td>
                 <td className="px-4 py-3 text-right">
                   <ChevronRight size={14} className="text-gray-400 ml-auto" />
                 </td>
@@ -170,11 +149,11 @@ export function PropertyList() {
           <p className="text-xs text-gray-400">顯示 1–{filtered.length} 筆，共 {filtered.length} 筆</p>
           <div className="flex gap-1">
             <button className="px-3 py-1 text-xs border border-gray-300 rounded text-gray-500 bg-white">上一頁</button>
-            <button className="px-3 py-1 text-xs border border-gray-800 rounded bg-gray-800 text-white">1</button>
+            <button className="px-3 py-1 text-xs border border-brand rounded bg-brand text-white">1</button>
             <button className="px-3 py-1 text-xs border border-gray-300 rounded text-gray-500 bg-white">下一頁</button>
           </div>
         </div>
-      </div>
+      </BrandCard>
     </div>
   );
 }

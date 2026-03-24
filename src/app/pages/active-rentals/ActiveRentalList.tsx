@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Search, ChevronRight, Filter, Plus } from "lucide-react";
-import { useVersion } from "../../context/VersionContext";
 import { activeRentals, properties, landlords, tenants } from "../../data/mockData";
-import { StatusBadge, UpgradeTag } from "../../components/WireframeTag";
+import { StatusBadge, UpgradeTag, BrandButton, FilterButton, BrandCard } from "../../components/WireframeTag";
 import { getLeaseStatus, getDaysUntilExpiry } from "./leaseUtils";
 
 export function ActiveRentalList() {
-  const { isUpgrade } = useVersion();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("全部");
@@ -59,34 +57,27 @@ export function ActiveRentalList() {
           <h1 className="text-gray-800 text-lg">出租中物件</h1>
           <p className="text-xs text-gray-400 mt-0.5">共 {filtered.length} 筆資料</p>
         </div>
-        <button
-          onClick={() => navigate("/active-rentals/new")}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700 transition-colors"
-        >
-          <Plus size={15} />
+        <BrandButton onClick={() => navigate("/active-rentals/new")} icon={<Plus size={15} />}>
           新增出租中物件
-        </button>
+        </BrandButton>
       </div>
 
       {/* Search & Filter */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+      <BrandCard className="p-4 mb-4">
         <div className="flex gap-3 items-center">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
-              className="w-full border border-gray-300 rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+              className="w-full border border-gray-300 rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-brand-border"
               placeholder="搜尋物件名稱、地址、出租人、承租人..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <button
-            className={`flex items-center gap-2 px-3 py-2 border text-sm rounded transition-colors ${showFilter ? "border-gray-800 bg-gray-800 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
-            onClick={() => setShowFilter(!showFilter)}
-          >
+          <FilterButton active={showFilter} onClick={() => setShowFilter(!showFilter)}>
             <Filter size={14} />篩選
-          </button>
-          <button className="px-4 py-2 border border-gray-300 text-sm text-gray-600 rounded hover:bg-gray-50">搜尋</button>
+          </FilterButton>
+          <BrandButton size="sm">搜尋</BrandButton>
           <button className="px-3 py-2 text-xs text-gray-400 hover:text-gray-600" onClick={() => { setSearch(""); setTypeFilter("全部"); setLeaseFilter("全部"); }}>清除</button>
         </div>
 
@@ -95,14 +86,10 @@ export function ActiveRentalList() {
             <div className="flex flex-col gap-1">
               <label className="text-xs text-gray-500">租案類型</label>
               <div className="flex gap-1.5">
-                {["全部", "一般租案", ...(isUpgrade ? ["社宅包租案", "社宅代租案"] : [])].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTypeFilter(t)}
-                    className={`px-3 py-1 text-xs rounded border transition-colors ${typeFilter === t ? "border-gray-800 bg-gray-800 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
-                  >
+                {["全部", "一般租案", "社宅包租案", "社宅代租案"].map((t) => (
+                  <FilterButton key={t} active={typeFilter === t} onClick={() => setTypeFilter(t)}>
                     {t}
-                  </button>
+                  </FilterButton>
                 ))}
               </div>
             </div>
@@ -110,30 +97,24 @@ export function ActiveRentalList() {
               <label className="text-xs text-gray-500">租約狀態</label>
               <div className="flex gap-1.5">
                 {["全部", "進行中", "即將到期", "已到期", "已結束"].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setLeaseFilter(t)}
-                    className={`px-3 py-1 text-xs rounded border transition-colors ${leaseFilter === t ? "border-gray-800 bg-gray-800 text-white" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}
-                  >
+                  <FilterButton key={t} active={leaseFilter === t} onClick={() => setLeaseFilter(t)}>
                     {t}
-                  </button>
+                  </FilterButton>
                 ))}
               </div>
             </div>
           </div>
         )}
-      </div>
+      </BrandCard>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <BrandCard className="overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              {isUpgrade && (
-                <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
+              <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium whitespace-nowrap">
                   <span className="flex items-center gap-1">案號 <UpgradeTag /></span>
                 </th>
-              )}
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">物件名稱</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">地址</th>
               <th className="px-4 py-3 text-left text-xs text-gray-500 font-medium">出租人</th>
@@ -151,9 +132,7 @@ export function ActiveRentalList() {
                 className="hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => navigate(`/active-rentals/${row.id}`)}
               >
-                {isUpgrade && (
-                  <td className="px-4 py-3 text-gray-500 text-xs font-mono">{row.id}</td>
-                )}
+                <td className="px-4 py-3 text-gray-500 text-xs font-mono">{row.id}</td>
                 <td className="px-4 py-3">
                   <span className="text-gray-800">{row.property?.name}</span>
                 </td>
@@ -185,11 +164,11 @@ export function ActiveRentalList() {
           <p className="text-xs text-gray-400">顯示 1–{filtered.length} 筆，共 {filtered.length} 筆</p>
           <div className="flex gap-1">
             <button className="px-3 py-1 text-xs border border-gray-300 rounded text-gray-500 bg-white">上一頁</button>
-            <button className="px-3 py-1 text-xs border border-gray-800 rounded bg-gray-800 text-white">1</button>
+            <button className="px-3 py-1 text-xs border border-brand rounded bg-brand text-white">1</button>
             <button className="px-3 py-1 text-xs border border-gray-300 rounded text-gray-500 bg-white">下一頁</button>
           </div>
         </div>
-      </div>
+      </BrandCard>
     </div>
   );
 }

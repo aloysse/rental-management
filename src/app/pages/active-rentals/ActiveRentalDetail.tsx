@@ -4,11 +4,10 @@ import {
   ArrowLeft, Save, Download, Plus, Zap, ChevronRight,
   AlertTriangle, AlertCircle,
 } from "lucide-react";
-import { useVersion } from "../../context/VersionContext";
 import { activeRentals, properties, landlords, tenants } from "../../data/mockData";
 import {
   FormField, StatusBadge,
-  RadioGroup, FileAttachmentList, FileUploadButton,
+  RadioGroup, FileAttachmentList, FileUploadButton, BrandButton,
 } from "../../components/WireframeTag";
 import { StepNavBar } from "../../components/StepNavBar";
 import { StepTabBar } from "../../components/StepTabBar";
@@ -34,7 +33,6 @@ type TabId =
 export function ActiveRentalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isUpgrade } = useVersion();
 
   const isNew = id === "new";
   const rental = isNew ? null : (activeRentals.find((ar) => ar.id === id) ?? activeRentals[0]);
@@ -94,7 +92,7 @@ export function ActiveRentalDetail() {
     { id: "landlordInfo" as TabId, label: "出租人資訊" },
     { id: "condition" as TabId, label: "屋況設備" },
     { id: "tenantInfo" as TabId, label: "承租人資訊" },
-    ...(isUpgrade ? [{ id: "socialMatch" as TabId, label: "社宅媒合申請" }] : []),
+    { id: "socialMatch" as TabId, label: "社宅媒合申請" },
     { id: "contracts" as TabId, label: "契約文件" },
     { id: "payments" as TabId, label: "繳費紀錄" },
     { id: "attachments" as TabId, label: "附加檔案" },
@@ -180,7 +178,7 @@ export function ActiveRentalDetail() {
             )}
           </div>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
+        <button className="flex items-center gap-2 px-4 py-2 bg-brand text-white text-sm rounded hover:bg-brand-dark">
           <Save size={14} />儲存
         </button>
       </div>
@@ -228,7 +226,6 @@ export function ActiveRentalDetail() {
           <div className="col-span-2 space-y-5">
             <PropertyRentalTypeCard
               rentalType={rental?.rentalType}
-              isUpgrade={isUpgrade}
               defaultGeneralChecked={!rental}
             />
             <PropertyBasicInfoCard property={property} />
@@ -311,7 +308,7 @@ export function ActiveRentalDetail() {
                     </div>
                     <button
                       onClick={() => setShowRenewalModal(true)}
-                      className="px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700 whitespace-nowrap"
+                      className="px-4 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark whitespace-nowrap"
                     >
                       續約
                     </button>
@@ -380,8 +377,8 @@ export function ActiveRentalDetail() {
         </div>
       )}
 
-      {/* ── Tab: 社宅媒合申請（升級版）── */}
-      {activeTab === "socialMatch" && isUpgrade && (
+      {/* ── Tab: 社宅媒合申請 ── */}
+      {activeTab === "socialMatch" && (
         <div className="max-w-2xl space-y-5">
           <div className="bg-white border border-gray-200 rounded-lg p-5">
             <h2 className="text-sm text-gray-700 mb-4 pb-2 border-b border-gray-100">社宅媒合申請</h2>
@@ -416,7 +413,7 @@ export function ActiveRentalDetail() {
             <h2 className="text-sm text-gray-700">契約清單</h2>
             <button
               onClick={() => setShowContractModal(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 text-white text-sm rounded hover:bg-gray-700"
+              className="flex items-center gap-2 px-3 py-1.5 bg-brand text-white text-sm rounded hover:bg-brand-dark"
             >
               <Plus size={14} />新增契約
             </button>

@@ -1,10 +1,139 @@
 import { Zap, Plus, Download, Trash2 } from "lucide-react";
 
+// ─── Brand Design System Components ────────────────────────────────────────
+
+export function BrandButton({
+  children,
+  onClick,
+  icon,
+  size = "md",
+  disabled,
+  type = "button",
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  icon?: React.ReactNode;
+  size?: "sm" | "md";
+  disabled?: boolean;
+  type?: "button" | "submit";
+}) {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white rounded transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+        size === "sm" ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"
+      }`}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+export function OutlineButton({
+  children,
+  onClick,
+  icon,
+  size = "md",
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  icon?: React.ReactNode;
+  size?: "sm" | "md";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 border border-brand text-brand bg-white hover:bg-brand-light rounded transition-colors font-medium ${
+        size === "sm" ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"
+      }`}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+export function FilterButton({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded border text-sm transition-colors ${
+        active
+          ? "bg-brand text-white border-brand"
+          : "border-gray-300 text-gray-600 hover:bg-gray-50"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function SegmentedControl({
+  options,
+  value,
+  onChange,
+}: {
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="inline-flex rounded-full border border-gray-200 overflow-hidden bg-white text-sm">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          type="button"
+          onClick={() => onChange(opt)}
+          className={`px-4 py-1.5 transition-colors ${
+            value === opt
+              ? "bg-brand text-white font-medium"
+              : "text-gray-500 hover:bg-gray-50"
+          }`}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function BrandCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`bg-white rounded-lg shadow-sm border border-gray-100 ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ─── End Brand Design System Components ────────────────────────────────────
+
+
 export function UpgradeTag() {
   return (
     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 text-amber-600 text-[10px] rounded border border-amber-300">
       <Zap size={9} />
-      升級版
+      社宅
     </span>
   );
 }
@@ -15,7 +144,7 @@ export function UpgradeSection({ children, label }: { children: React.ReactNode;
       <div className="absolute -top-2.5 left-3 bg-amber-50 px-1">
         <span className="inline-flex items-center gap-1 text-amber-600 text-xs font-medium">
           <Zap size={11} />
-          {label || "升級版功能"}
+          {label || "社宅功能"}
         </span>
       </div>
       {children}
@@ -71,7 +200,7 @@ export function StatusBadge({ status }: { status: string }) {
     "待租": "bg-yellow-100 text-yellow-700 border-yellow-300",
   };
   return (
-    <span className={`inline-flex px-2 py-0.5 text-xs rounded border ${styles[status] || "bg-gray-100 text-gray-600 border-gray-300"}`}>
+    <span className={`inline-flex px-2.5 py-0.5 text-xs rounded-full border ${styles[status] || "bg-gray-100 text-gray-600 border-gray-300"}`}>
       {status}
     </span>
   );

@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { X, Download, FileText, Zap, CheckCircle, ChevronRight } from "lucide-react";
-import { useVersion } from "../context/VersionContext";
 import { FormField, UpgradeSection } from "./WireframeTag";
 import {
   buildContractFormInitialValues,
@@ -228,13 +227,13 @@ function SchemaContractEditDialog({
                 >
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                      step >= i ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-400"
+                      step >= i ? "bg-brand text-white" : "bg-gray-100 text-gray-400"
                     }`}
                   >
                     {i + 1}
                   </span>
                   {i < steps.length - 1 && (
-                    <div className={`w-6 h-px ${step > i ? "bg-gray-800" : "bg-gray-200"}`} />
+                    <div className={`w-6 h-px ${step > i ? "bg-brand" : "bg-gray-200"}`} />
                   )}
                 </button>
               ))}
@@ -313,7 +312,7 @@ function SchemaContractEditDialog({
                 </button>
                 <button
                   onClick={onClose}
-                  className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
+                  className="px-5 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark"
                 >
                   儲存並關閉
                 </button>
@@ -321,7 +320,7 @@ function SchemaContractEditDialog({
             ) : (
               <button
                 onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
-                className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
+                className="px-5 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark"
               >
                 下一步
               </button>
@@ -355,13 +354,13 @@ function LegacyDelegationContractEditDialog({
                 <div key={i} className={`flex items-center ${i < steps.length - 1 ? "gap-2" : ""}`}>
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                      step >= i ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-400"
+                      step >= i ? "bg-brand text-white" : "bg-gray-100 text-gray-400"
                     }`}
                   >
                     {i + 1}
                   </div>
                   {i < steps.length - 1 && (
-                    <div className={`w-6 h-px ${step > i ? "bg-gray-800" : "bg-gray-200"}`} />
+                    <div className={`w-6 h-px ${step > i ? "bg-brand" : "bg-gray-200"}`} />
                   )}
                 </div>
               ))}
@@ -444,7 +443,7 @@ function LegacyDelegationContractEditDialog({
                 </button>
                 <button
                   onClick={onClose}
-                  className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
+                  className="px-5 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark"
                 >
                   儲存並關閉
                 </button>
@@ -452,7 +451,7 @@ function LegacyDelegationContractEditDialog({
             ) : (
               <button
                 onClick={() => setStep((s) => (s + 1) as 0 | 1 | 2 | 3)}
-                className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
+                className="px-5 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark"
               >
                 下一步
               </button>
@@ -503,7 +502,6 @@ export function RentalContractEditDialog({
   landlord?: any;
   onClose: () => void;
 }) {
-  const { isUpgrade } = useVersion();
   const schema = getDelegationContractFormSchema(contractTypeId);
   if (schema) {
     return (
@@ -535,9 +533,9 @@ export function RentalContractEditDialog({
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border-2 ${
                         i < step
-                          ? "bg-gray-800 border-gray-800 text-white"
+                          ? "bg-brand border-brand text-white"
                           : i === step
-                          ? "border-gray-800 bg-white text-gray-800"
+                          ? "border-brand bg-white text-brand"
                           : "border-gray-300 bg-white text-gray-400"
                       }`}
                     >
@@ -545,14 +543,14 @@ export function RentalContractEditDialog({
                     </div>
                     <span
                       className={`text-xs whitespace-nowrap ${
-                        i === step ? "text-gray-800" : i < step ? "text-gray-600" : "text-gray-400"
+                        i === step ? "text-brand" : i < step ? "text-gray-600" : "text-gray-400"
                       }`}
                     >
                       {s}
                     </span>
                   </button>
                   {i < STEPS.length - 1 && (
-                    <div className={`flex-1 h-px mx-2 ${i < step ? "bg-gray-800" : "bg-gray-200"}`} />
+                    <div className={`flex-1 h-px mx-2 ${i < step ? "bg-brand" : "bg-gray-200"}`} />
                   )}
                 </div>
               ))}
@@ -577,7 +575,7 @@ export function RentalContractEditDialog({
                       <FormField label="出租人" type="select" />
                       <FormField label="承租人" type="select" />
                       <FormField label="簽署日期" placeholder="YYYY-MM-DD" />
-                      {isUpgrade && <FormField label="申請狀態" type="select" placeholder="未申請" />}
+                      <FormField label="申請狀態" type="select" placeholder="未申請" />
                     </div>
                   </div>
                 </div>
@@ -688,7 +686,7 @@ export function RentalContractEditDialog({
                   {!isLastStep ? (
                     <button
                       onClick={() => setStep((s) => Math.min(3, s + 1))}
-                      className="flex-1 px-3 py-2 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 flex items-center justify-center gap-1"
+                      className="flex-1 px-3 py-2 bg-brand text-white text-xs rounded hover:bg-brand-dark flex items-center justify-center gap-1"
                     >
                       下一步 <ChevronRight size={12} />
                     </button>
@@ -707,17 +705,15 @@ export function RentalContractEditDialog({
                   </button>
                   <button
                     onClick={onClose}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-800 text-white text-sm rounded hover:bg-gray-700"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand text-white text-sm rounded hover:bg-brand-dark"
                   >
                     儲存並關閉
                   </button>
-                  {isUpgrade && (
-                    <UpgradeSection label="升級版功能">
-                      <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm rounded hover:bg-amber-600">
-                        <Zap size={14} />一鍵填表申請
-                      </button>
-                    </UpgradeSection>
-                  )}
+                  <UpgradeSection label="社宅功能">
+                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm rounded hover:bg-amber-600">
+                      <Zap size={14} />一鍵填表申請
+                    </button>
+                  </UpgradeSection>
                 </>
               )}
             </div>

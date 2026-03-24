@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { X, FileText, Zap } from "lucide-react";
-import { useVersion } from "../context/VersionContext";
 import {
   BASE_CONTRACT_TYPES,
   UPGRADE_CONTRACT_TYPES,
@@ -53,7 +52,7 @@ function TypeButton({
           : isSelected
           ? isUpgradeVariant
             ? "border-amber-500 bg-amber-50 ring-1 ring-amber-400"
-            : "border-gray-800 bg-gray-50 ring-1 ring-gray-800"
+            : "border-brand bg-brand-light ring-1 ring-brand"
           : isUpgradeVariant
           ? "border-amber-200 bg-amber-50/40 hover:border-amber-300 hover:bg-amber-50"
           : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
@@ -64,7 +63,7 @@ function TypeButton({
           isSelected && !isUsed
             ? isUpgradeVariant
               ? "bg-amber-500"
-              : "bg-gray-800"
+              : "bg-brand"
             : isUpgradeVariant
             ? "bg-amber-100"
             : "bg-gray-100"
@@ -104,7 +103,7 @@ function TypeButton({
             isSelected
               ? isUpgradeVariant
                 ? "border-amber-500 bg-amber-500"
-                : "border-gray-800 bg-gray-800"
+                : "border-brand bg-brand"
               : isUpgradeVariant
               ? "border-amber-300"
               : "border-gray-300"
@@ -127,16 +126,15 @@ export function ContractTypeModal({
   existingTypeIds,
   onSelect,
 }: ContractTypeModalProps) {
-  const { isUpgrade } = useVersion();
   const [selected, setSelected] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
   const [step, setStep] = useState<"type" | "period">("type");
 
   const allTypes = [
     ...(mode === "rental" ? BASE_CONTRACT_TYPES : []),
-    ...(mode === "rental" && isUpgrade ? UPGRADE_CONTRACT_TYPES : []),
+    ...(mode === "rental" ? UPGRADE_CONTRACT_TYPES : []),
     ...DELEGATION_TYPES,
-    ...(isUpgrade ? UPGRADE_DELEGATION_TYPES : []),
+    ...UPGRADE_DELEGATION_TYPES,
   ];
   const selectedLabel = allTypes.find((t) => t.id === selected)?.label ?? "";
   const upgradeTypeIds = new Set([
@@ -264,17 +262,16 @@ export function ContractTypeModal({
               />
             ))}
 
-            {/* 升級版區塊 */}
-            {isUpgrade && (
-              <>
-                <div className="flex items-center gap-2 pt-2 pb-1">
-                  <div className="flex-1 h-px bg-amber-200" />
-                  <span className="flex items-center gap-1 text-xs text-amber-600 px-1">
-                    <Zap size={11} />升級版專屬
-                  </span>
-                  <div className="flex-1 h-px bg-amber-200" />
-                </div>
-                {mode === "rental" &&
+            {/* 社宅區塊 */}
+            <>
+              <div className="flex items-center gap-2 pt-2 pb-1">
+                <div className="flex-1 h-px bg-amber-200" />
+                <span className="flex items-center gap-1 text-xs text-amber-600 px-1">
+                  <Zap size={11} />社宅
+                </span>
+                <div className="flex-1 h-px bg-amber-200" />
+              </div>
+              {mode === "rental" &&
                   UPGRADE_CONTRACT_TYPES.map((type) => (
                     <TypeButton
                       key={type.id}
@@ -285,19 +282,18 @@ export function ContractTypeModal({
                       onSelect={handleTypeSelect}
                     />
                   ))}
-                {UPGRADE_DELEGATION_TYPES.map((type) => (
-                  <TypeButton
-                    key={type.id}
-                    type={type}
-                    selected={selected}
-                    isUsed={existingTypeIds.includes(type.id)}
-                    variant="upgrade"
-                    onSelect={handleTypeSelect}
-                    badge={mode === "rental" ? delegationBadge : undefined}
-                  />
-                ))}
-              </>
-            )}
+              {UPGRADE_DELEGATION_TYPES.map((type) => (
+                <TypeButton
+                  key={type.id}
+                  type={type}
+                  selected={selected}
+                  isUsed={existingTypeIds.includes(type.id)}
+                  variant="upgrade"
+                  onSelect={handleTypeSelect}
+                  badge={mode === "rental" ? delegationBadge : undefined}
+                />
+              ))}
+            </>
           </div>
         )}
 
@@ -319,7 +315,7 @@ export function ContractTypeModal({
           <button
             disabled={!selected || (step === "period" && !selectedPeriod)}
             onClick={handlePrimaryAction}
-            className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-5 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {step === "period" ? "建立契約" : "下一步"}
           </button>

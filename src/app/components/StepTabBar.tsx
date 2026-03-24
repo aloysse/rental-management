@@ -21,7 +21,7 @@ export function StepTabBar({ tabs, activeTab, onTabChange }: StepTabBarProps) {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
                     isActive
-                      ? "bg-gray-800 text-white"
+                      ? "bg-brand text-white"
                       : "bg-white border-2 border-gray-300 text-gray-400"
                   }`}
                 >
@@ -29,7 +29,7 @@ export function StepTabBar({ tabs, activeTab, onTabChange }: StepTabBarProps) {
                 </div>
                 <span
                   className={`text-xs whitespace-nowrap ${
-                    isActive ? "text-gray-800 font-medium" : "text-gray-400"
+                    isActive ? "text-brand font-medium" : "text-gray-400"
                   }`}
                 >
                   {tab.label}

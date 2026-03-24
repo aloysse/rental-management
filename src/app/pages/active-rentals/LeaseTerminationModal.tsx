@@ -32,7 +32,7 @@ export function LeaseTerminationModal({
             <div className="flex items-center gap-2 mt-1">
               {[1, 2].map((s) => (
                 <div key={s} className="flex items-center gap-1">
-                  <div className={`w-5 h-5 rounded-full text-xs flex items-center justify-center border-2 ${s < step ? "bg-gray-800 border-gray-800 text-white" : s === step ? "border-gray-800 text-gray-800 bg-white" : "border-gray-300 text-gray-400 bg-white"}`}>
+                  <div className={`w-5 h-5 rounded-full text-xs flex items-center justify-center border-2 ${s < step ? "bg-brand border-brand text-white" : s === step ? "border-brand text-brand bg-white" : "border-gray-300 text-gray-400 bg-white"}`}>
                     {s}
                   </div>
                   <span className={`text-xs ${s === step ? "text-gray-800" : "text-gray-400"}`}>
@@ -143,7 +143,7 @@ export function LeaseTerminationModal({
               <button
                 disabled={!reason}
                 onClick={() => setStep(2)}
-                className="px-5 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-5 py-2 text-sm bg-brand text-white rounded hover:bg-brand-dark disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 下一步 →
               </button>

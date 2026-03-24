@@ -58,12 +58,12 @@ export function LeaseRenewalModal({
               {STEPS.map((s, i) => (
                 <div key={i} className="flex items-center flex-1 last:flex-none">
                   <div className="flex items-center gap-1.5">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border-2 ${i < step ? "bg-gray-800 border-gray-800 text-white" : i === step ? "border-gray-800 bg-white text-gray-800" : "border-gray-300 bg-white text-gray-400"}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border-2 ${i < step ? "bg-brand border-brand text-white" : i === step ? "border-brand bg-white text-brand" : "border-gray-300 bg-white text-gray-400"}`}>
                       {i < step ? <CheckCircle size={12} /> : i + 1}
                     </div>
                     <span className={`text-xs whitespace-nowrap ${i === step ? "text-gray-800" : i < step ? "text-gray-600" : "text-gray-400"}`}>{s}</span>
                   </div>
-                  {i < STEPS.length - 1 && <div className={`flex-1 h-px mx-2 ${i < step ? "bg-gray-800" : "bg-gray-200"}`} />}
+                  {i < STEPS.length - 1 && <div className={`flex-1 h-px mx-2 ${i < step ? "bg-brand" : "bg-gray-200"}`} />}
                 </div>
               ))}
             </div>
@@ -219,7 +219,7 @@ export function LeaseRenewalModal({
                   <button
                     disabled={step === 1 && !allChecks1}
                     onClick={() => setStep((s) => s + 1)}
-                    className="px-3 py-2 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-3 py-2 bg-brand text-white text-xs rounded hover:bg-brand-dark flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     下一步 <ChevronRight size={12} />
                   </button>

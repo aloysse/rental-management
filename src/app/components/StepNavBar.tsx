@@ -34,7 +34,7 @@ export function StepNavBar({ tabs, activeTab, onTabChange, nextLabel }: StepNavB
         {nextTab && (
           <button
             onClick={() => onTabChange(nextTab.id)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-brand text-white text-sm rounded hover:bg-brand-dark transition-colors"
           >
             {nextLabel ?? nextTab.label}
             <ArrowRight size={14} />
