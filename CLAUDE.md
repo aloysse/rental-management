@@ -2,13 +2,13 @@
 
 ## 專案概述
 
-這是一個租屋管理系統的 **Wireframe Prototype**，目的是快速完成 UI 框架與流程驗證。
+這是一個租屋管理系統的 **Wireframe Prototype**，目的是快速完成 UI 與流程驗證。
 
 ## 設計原則
 
-- **灰階為主**：所有基礎 UI 元素使用灰階配色
-- **顏色使用時機**：僅在特殊狀態（如錯誤、警告、成功）或重要區塊使用顏色強調
-- **快速原型**：優先完成功能框架，不追求視覺精緻度
+- **使用 figma 設計稿**：按照 figma 設計稿來切版
+- **設計為元件**：將所有元素設計為元件，直接引用
+- **使用 react-icons 套件**：所有設計稿的 icon 使用 react-icons 套件
 
 ## Mock Data 規則
 
@@ -21,9 +21,9 @@
 - **框架**: React 18 + TypeScript
 - **建置工具**: Vite
 - **樣式**: Tailwind CSS 4
-- **UI 元件**: shadcn/ui (Radix UI)
+- **UI 元件**: Material UI
 - **路由**: React Router 7
-- **圖標**: Lucide React
+- **圖標**: react-icons
 
 ## 專案結構
 
@@ -31,16 +31,17 @@
 src/
 ├── app/
 │   ├── components/     # 共用元件
-│   │   ├── ui/         # shadcn/ui 基礎元件
+│   │   ├── ui/         # Material UI 基礎元件
 │   │   └── Layout.tsx  # 版面配置
 │   ├── context/        # React Context
 │   ├── data/           # Mock 資料
 │   │   └── mockData.ts
 │   ├── pages/          # 頁面元件
-│   │   ├── contracts/  # 合約管理
-│   │   ├── landlords/  # 房東管理
-│   │   ├── properties/ # 物件管理
-│   │   └── tenants/    # 租客管理
+│   │   ├── host/  # 業者資料
+│   │   ├── landlords/  # 出租人管理
+│   │   ├── properties/ # 委託出租物件
+│   │   ├── active-rentals/ # 出租中物件
+│   │   └── tenants/    # 承租人管理
 │   ├── App.tsx
 │   └── routes.tsx      # 路由設定
 ├── styles/             # 全域樣式
@@ -58,5 +59,5 @@ npm run build  # 建置專案
 
 1. 新增頁面時需同步更新 `routes.tsx`
 2. 新增資料欄位時需同步更新 `mockData.ts`
-3. 使用 shadcn/ui 元件保持一致性
-4. 避免過度設計，保持 wireframe 簡潔風格
+3. 使用 Material UI 元件保持一致性
+4. 依據指令完成區塊，不要一次完成所有 figma 設計稿的所有內容
